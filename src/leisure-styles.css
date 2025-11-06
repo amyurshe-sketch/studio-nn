@@ -1,0 +1,398 @@
+/* leisure-styles.css - полные стили для LeisurePage */
+
+/* === ЛОКАЛЬНЫЕ CSS ПЕРЕМЕННЫЕ ДЛЯ ТЕМ === */
+.leisure-page {
+  /* Light тема по умолчанию — серый, чуть светлее, как просили */
+  --leisure-bg: linear-gradient(135deg, #4b5563 0%, #64748b 100%); /* slate-700 → slate-500 */
+  --leisure-text: white;
+  --leisure-surface: rgba(255, 255, 255, 0.1);
+  --leisure-border: rgba(255, 255, 255, 0.2);
+  --leisure-surface-2: rgba(255, 255, 255, 0.15);
+  --leisure-accent: #a78bfa;
+  --leisure-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.leisure-page[data-leisure-theme="dark"] {
+  /* Dark тема */
+  --leisure-bg: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
+  --leisure-text: #e2e8f0;
+  --leisure-surface: rgba(255, 255, 255, 0.05);
+  --leisure-border: rgba(255, 255, 255, 0.1);
+  --leisure-surface-2: rgba(255, 255, 255, 0.08);
+  --leisure-accent: #90cdf4;
+  --leisure-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.leisure-page[data-leisure-theme="night"] {
+  /* Night тема */
+  --leisure-bg: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
+  --leisure-text: #cbd5e0;
+  --leisure-surface: rgba(255, 255, 255, 0.03);
+  --leisure-border: rgba(255, 255, 255, 0.08);
+  --leisure-surface-2: rgba(255, 255, 255, 0.05);
+  --leisure-accent: #63b3ed;
+  --leisure-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+/* === ОСНОВНЫЕ СТИЛИ LEISUREPAGE === */
+.leisure-page {
+  background: var(--leisure-bg);
+  color: var(--leisure-text);
+  min-height: 100vh;
+  padding: 2rem;
+  transition: all 0.3s ease;
+  overflow-x: hidden; /* avoid accidental horizontal scroll on mobile */
+}
+
+.leisure-page .page-title {
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+  text-align: center;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.leisure-page .page-description {
+  text-align: center;
+  font-size: 1.1rem;
+  opacity: 0.9;
+  margin-bottom: 2rem;
+}
+
+/* === КОНТРОЛЛЕРЫ ТЕМ === */
+.leisure-theme-controls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  justify-content: center;
+  margin: 1rem 0 2rem 0;
+  padding: 1rem;
+  background: var(--leisure-surface);
+  border-radius: 12px;
+  border: 1px solid var(--leisure-border);
+  backdrop-filter: blur(10px);
+}
+
+.leisure-theme-toggle {
+  background: var(--leisure-surface-2);
+  border: 1px solid var(--leisure-border);
+  color: var(--leisure-text);
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1.2rem;
+  transition: all 0.3s ease;
+}
+
+.leisure-theme-toggle:hover {
+  background: var(--leisure-accent);
+  transform: scale(1.1);
+}
+
+.leisure-theme-label {
+  color: var(--leisure-text);
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.leisure-theme-info {
+  color: var(--leisure-text);
+  opacity: 0.7;
+  font-size: 0.8rem;
+  margin-left: auto;
+}
+
+/* === КОНТЕЙНЕР НОВОСТЕЙ === */
+.leisure-page .news-columns-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  margin-bottom: 3rem;
+}
+
+.leisure-page .news-column {
+  /* Делаем новости более "интегрированными" в полотно страницы */
+  background: transparent;
+  backdrop-filter: none;
+  border-radius: 0;
+  padding: 0;
+  border: none;
+  box-shadow: none;
+}
+
+.leisure-page .content-title {
+  font-size: 1.5rem;
+  margin-bottom: 0.75rem;
+  color: var(--leisure-text);
+  border-bottom: 1px solid var(--leisure-border);
+  padding-bottom: 0.35rem;
+}
+
+/* === ЭЛЕМЕНТЫ НОВОСТЕЙ === */
+.leisure-page .news-content-item {
+  margin: 0;
+  padding: 0.6rem 0;
+  background: transparent;
+  border-radius: 0;
+  border-bottom: 1px solid var(--leisure-border);
+  position: relative; /* для позиционирования всплывающего описания */
+}
+
+.leisure-page .news-content-item:last-child {
+  border-bottom: none;
+}
+
+.leisure-page .news-content-title {
+  margin-bottom: 0.5rem;
+}
+
+.leisure-page .news-content-title a {
+  color: var(--leisure-text);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 1.1rem;
+  transition: color 0.3s ease;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.leisure-page .news-content-title a:hover {
+  color: var(--leisure-accent);
+  text-decoration: underline;
+}
+
+.leisure-page .news-content-summary {
+  /* Скрыто по умолчанию, выпадает поверх контента, не двигая разметку */
+  line-height: 1.55;
+  font-size: 0.95rem;
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 100%;
+  margin-top: 6px;
+  padding: 0.85rem 1rem;
+  /* Болеe плотный фон и читаемые цвета по темам */
+  background: rgba(255, 255, 255, 0.96);
+  color: #0f172a; /* slate-900 */
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  border-radius: 12px;
+  box-shadow: var(--leisure-shadow);
+  z-index: 50;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-6px);
+  pointer-events: none;
+  transition: opacity 200ms ease, transform 200ms ease, visibility 200ms ease;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+/* Тёмные темы: насыщенный тёмный фон и светлый текст */
+.leisure-page[data-leisure-theme='dark'] .news-content-summary,
+.leisure-page[data-leisure-theme='night'] .news-content-summary {
+  /* Сильный контраст в тёмной теме */
+  background: #0b1220; /* плотный тёмный фон */
+  color: #f1f5f9;      /* почти белый текст */
+  border-color: rgba(255, 255, 255, 0.22);
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.06) inset;
+}
+
+/* Ссылки внутри описания наследуют цвет для контраста в тёмной теме */
+.leisure-page .news-content-summary a {
+  color: inherit;
+  text-decoration: underline;
+}
+
+/* Показ при наведении/фокусе на заголовок; оставляем открытым при ховере на самом описании */
+.leisure-page .news-content-title:hover + .news-content-summary,
+.leisure-page .news-content-title:focus-within + .news-content-summary,
+.leisure-page .news-content-summary:hover {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.leisure-page .news-content-meta {
+  color: var(--leisure-text);
+  opacity: 0.65;
+  font-size: 0.8rem;
+}
+
+/* === СЕКЦИИ === */
+.leisure-page .fun-facts,
+.leisure-page .quick-actions,
+.leisure-page .motivation-section {
+  background: var(--leisure-surface);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  border: 1px solid var(--leisure-border);
+  box-shadow: var(--leisure-shadow);
+}
+
+.leisure-page .fun-facts h3,
+.leisure-page .quick-actions h3,
+.leisure-page .motivation-section h3 {
+  color: var(--leisure-text);
+  margin-bottom: 1.5rem;
+  font-size: 1.4rem;
+}
+
+/* === КАРТОЧКИ ФАКТОВ === */
+.leisure-page .facts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+}
+
+.leisure-page .fact-card {
+  background: var(--leisure-surface-2);
+  padding: 1.5rem;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  transition: all 0.3s ease;
+  border: 1px solid transparent;
+}
+
+.leisure-page .fact-card:hover {
+  background: var(--leisure-surface);
+  transform: translateY(-2px);
+  border-color: var(--leisure-border);
+}
+
+.leisure-page .fact-emoji {
+  font-size: 2rem;
+}
+
+.leisure-page .fact-card p {
+  margin: 0;
+  color: var(--leisure-text);
+  line-height: 1.4;
+}
+
+/* === КАРТОЧКИ ДЕЙСТВИЙ === */
+.leisure-page .actions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.leisure-page .action-card {
+  background: var(--leisure-surface-2);
+  padding: 1.5rem;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  transition: all 0.3s ease;
+  position: relative;
+  border: 1px solid transparent;
+}
+
+.leisure-page .action-card:not(.disabled):hover {
+  background: var(--leisure-surface);
+  transform: translateY(-2px);
+  border-color: var(--leisure-border);
+}
+
+.leisure-page .action-card.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.leisure-page .action-emoji {
+  font-size: 2rem;
+}
+
+.leisure-page .action-card h4 {
+  color: var(--leisure-text);
+  margin: 0 0 0.25rem 0;
+}
+
+.leisure-page .action-card p {
+  margin: 0;
+  color: var(--leisure-text);
+  opacity: 0.8;
+  font-size: 0.9rem;
+}
+
+.leisure-page .coming-badge {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: var(--leisure-accent);
+  color: var(--leisure-bg);
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+/* === МОТИВАЦИОННАЯ СЕКЦИЯ === */
+.leisure-page .motivation-quote {
+  color: var(--leisure-text);
+  font-size: 1.2rem;
+  line-height: 1.6;
+  margin: 0;
+  padding: 1.5rem;
+  background: var(--leisure-surface-2);
+  border-radius: 12px;
+  border-left: 4px solid var(--leisure-accent);
+}
+
+.leisure-page .motivation-quote footer {
+  margin-top: 1rem;
+  color: var(--leisure-text);
+  opacity: 0.7;
+  font-style: italic;
+  font-size: 0.9rem;
+}
+
+/* === СОСТОЯНИЯ ЗАГРУЗКИ И ОШИБОК === */
+.leisure-page .news-loading,
+.leisure-page .news-error {
+  text-align: center;
+  padding: 2rem;
+  color: var(--leisure-text);
+  font-style: italic;
+}
+
+.leisure-page .news-error {
+  background: rgba(255, 107, 107, 0.1);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 107, 107, 0.3);
+}
+
+/* === АДАПТИВНОСТЬ === */
+@media (max-width: 768px) {
+  .leisure-page {
+    padding: 1rem;
+  }
+  
+  .leisure-page .news-columns-container {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .leisure-page .facts-grid,
+  .leisure-page .actions-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .leisure-page .page-title {
+    font-size: 2rem;
+  }
+  
+  .leisure-theme-controls {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .leisure-theme-info {
+    margin-left: 0;
+    text-align: center;
+  }
+}
