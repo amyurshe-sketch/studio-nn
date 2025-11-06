@@ -15,6 +15,7 @@ import HomePage from './HomePage';
 import StatsPage from './StatsPage';
 import MessageButton from './components/MessageButton';
 import { useI18n } from './i18n';
+import { API_UNCONFIGURED } from './lib/env';
 
 function ProtectedRoute({ children }) {
   const { isAuthenticated, initializing } = useAuth();
@@ -72,28 +73,20 @@ function AppShell() {
   return (
     <div className={`App ${isAuthenticated ? 'App--auth' : ''}`}>
         {/* Protective banner if backend is not configured */}
-        {typeof window !== 'undefined' && (window as any) && (require('./lib/env') as any) &&
-          (() => {
-            try {
-              // dynamic import guard for build
-              const env = require('./lib/env') as any;
-              if (env.API_UNCONFIGURED) {
-                return (
-                  <div style={{
-                    background: 'linear-gradient(90deg, #fde68a, #f59e0b)',
-                    color: '#111827',
-                    padding: '8px 16px',
-                    textAlign: 'center',
-                    fontWeight: 700,
-                    letterSpacing: '0.02em'
-                  }}>
-                    Backend is not configured. Set VITE_API_BASE_URL and VITE_WS_URL in your deployment.
-                  </div>
-                );
-              }
-            } catch {}
-            return null;
-          })()}
+        {API_UNCONFIGURED && (
+          <div
+            style={{
+              background: 'linear-gradient(90deg, #fde68a, #f59e0b)',
+              color: '#111827',
+              padding: '8px 16px',
+              textAlign: 'center',
+              fontWeight: 700,
+              letterSpacing: '0.02em',
+            }}
+          >
+            Backend is not configured. Set VITE_API_BASE_URL and VITE_WS_URL in your deployment.
+          </div>
+        )}
         <header className="main-header">
           <div className="header-content">
             <div className="header-left">
