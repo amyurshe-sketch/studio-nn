@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useI18n } from './i18n';
+import { API_BASE_URL } from './lib/env';
 
 function RegisterPage() {
   const { t } = useI18n();
@@ -70,7 +71,7 @@ function RegisterPage() {
 
     try {
       // Инициируем регистрацию (отправляется код на тестовый email на сервере)
-      const response = await fetch('http://localhost:8000/register', {
+      const response = await fetch(`${API_BASE_URL}/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -110,7 +111,7 @@ function RegisterPage() {
     }
 
     try {
-      const response = await fetch('http://localhost:8000/verify-email', {
+      const response = await fetch(`${API_BASE_URL}/verify-email`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

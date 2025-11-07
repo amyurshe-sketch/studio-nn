@@ -42,13 +42,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(false);
   const [initializing, setInitializing] = useState(true);
 
+  const getCsrfToken = (): string | undefined => {
+    try {
+      const m = document.cookie.match(/(?:^|; )csrf_token=([^;]+)/);
+      if (m && m[1]) return decodeURIComponent(m[1]);
+    } catch {}
+    return undefined;
+  };
+
   const notifyOffline = useCallback(async (reason: string = 'logout') => {
     try {
       const payload: any = { ts: new Date().toISOString(), reason };
       if (user?.user_id) payload.user_id = user.user_id;
+      const headers: any = { 'Content-Type': 'application/json' };
+      const csrf = getCsrfToken();
+      if (csrf) headers['X-CSRF-Token'] = csrf;
       await fetch(`${API_BASE_URL}/presence/offline`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         credentials: 'include',
         body: JSON.stringify(payload),
         keepalive: true,
@@ -68,10 +79,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const refreshAccessToken = useCallback(async () => {
     // With HttpOnly cookies, server handles token rotation; optionally ping endpoint
     try {
-      const resp = await fetch('http://localhost:8000/refresh-token', {
-        method: 'POST',
-        credentials: 'include',
-      });
+      const headers: any = {};
+      const csrf = getCsrfToken();
+      if (csrf) headers['X-CSRF-Token'] = csrf;
+      const resp = await fetch(`${API_BASE_URL}/refresh-token`, { method: 'POST', credentials: 'include', headers });
       if (!resp.ok) return null;
       return await resp.json().catch(() => null);
     } catch {
@@ -184,10 +195,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // Mark offline explicitly before logout
       await notifyOffline('logout');
       try { if (wsClient.isReady()) wsClient.send('presence.offline', { ts: Date.now(), reason: 'logout' }); } catch {}
-      await fetch(`${API_BASE_URL}/logout`, {
-        method: 'POST',
-        credentials: 'include',
-      });
+      const headers: any = {};
+      const csrf = getCsrfToken();
+      if (csrf) headers['X-CSRF-Token'] = csrf;
+      await fetch(`${API_BASE_URL}/logout`, { method: 'POST', credentials: 'include', headers });
     } catch (error) {
       console.error('Logout API error:', error);
     } finally {
