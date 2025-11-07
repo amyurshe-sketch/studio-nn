@@ -1,4 +1,28 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <rect width="64" height="64" rx="8" ry="8" fill="#111319"/>
-  <text x="32" y="36" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif" font-weight="700" font-size="30" fill="#ffffff">NN</text>
+  <defs>
+    <!-- Neon green gradient for the letters -->
+    <linearGradient id="nn-neon" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#32ff7e"/>
+      <stop offset="50%" stop-color="#00ffa3"/>
+      <stop offset="100%" stop-color="#00ff6a"/>
+    </linearGradient>
+    <!-- Soft glow filter -->
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="1.6" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <rect width="64" height="64" rx="8" ry="8" fill="#0f1117"/>
+  <!-- Slight inner shadow for depth -->
+  <rect width="64" height="64" rx="8" ry="8" fill="none" stroke="#000" opacity="0.25"/>
+
+  <!-- Neon NN letters -->
+  <text x="32" y="38" text-anchor="middle"
+        font-family="system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif"
+        font-weight="800" font-size="30"
+        fill="url(#nn-neon)" filter="url(#glow)">NN</text>
 </svg>
