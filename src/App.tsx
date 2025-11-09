@@ -7,6 +7,7 @@ import LeisurePage from './LeisurePage';
 // Removed password/username auth pages
 import MessageButton from './components/MessageButton';
 import TelegramLoginModal from './components/TelegramLoginModal';
+import TelegramRedirectWidgetModal from './components/TelegramRedirectWidgetModal';
 import TelegramIcon from './components/icons/TelegramIcon';
 import { useAuth } from './hooks/useAuth';
 import { usePresence } from './hooks/usePresence';
@@ -41,6 +42,7 @@ function AppShell() {
   const [isNotifOpen, setIsNotifOpen] = useState(false);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [showTgModal, setShowTgModal] = useState(false);
+  const [showTgRedirectModal, setShowTgRedirectModal] = useState(false);
   const { t, language, setLanguage } = useI18n();
   const [theme, setTheme] = useState(() => {
     if (typeof window === 'undefined') return 'light';
@@ -69,6 +71,7 @@ function AppShell() {
   // Expose opener for HomePage buttons
   useEffect(() => {
     (window as any).__openTelegramLogin = () => setShowTgModal(true);
+    (window as any).__openTelegramRedirect = () => setShowTgRedirectModal(true);
     return () => { delete (window as any).__openTelegramLogin; };
   }, []);
 
@@ -297,6 +300,7 @@ function AppShell() {
 
         {/* Telegram Login Modal */}
         <TelegramLoginModal open={showTgModal} onClose={() => setShowTgModal(false)} />
+        <TelegramRedirectWidgetModal open={showTgRedirectModal} onClose={() => setShowTgRedirectModal(false)} />
     </div>
   );
 }

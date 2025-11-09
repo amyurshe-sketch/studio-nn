@@ -166,7 +166,7 @@ function HomePage() {
             <h1 className="hero-title">{t('home.hero.title')}</h1>
             <p className="hero-description">{t('home.hero.desc')}</p>
 
-            <div className="hero-cta-group" style={{ display: 'flex', gap: 12 }}>
+            <div className="hero-cta-group" style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
               <MessageButton
                 className="hero-primary-cta"
                 onClick={async () => {
@@ -200,10 +200,17 @@ function HomePage() {
                 </span>
               </MessageButton>
 
-              {/* Вход через виджет (встроенный Telegram Login Widget) */}
+              {/* Вход через виджет (callback) */}
               <MessageButton className="hero-secondary-cta" onClick={() => { (window as any).__openTelegramLogin?.(); }}>
                 <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
                   <TelegramIcon /> {t('auth.login.telegram')} (виджет)
+                </span>
+              </MessageButton>
+
+              {/* Вход через виджет (redirect to /tg-callback) */}
+              <MessageButton className="hero-secondary-cta" onClick={() => { (window as any).__openTelegramRedirect?.(); }}>
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+                  <TelegramIcon /> {t('auth.login.telegram')} (redirect)
                 </span>
               </MessageButton>
             </div>
@@ -252,7 +259,7 @@ function HomePage() {
             <h2>{t('home.invite.title')}</h2>
             <p>{t('home.invite.text')}</p>
           </div>
-          <div className="invite-actions" style={{ display: 'flex', gap: 12 }}>
+          <div className="invite-actions" style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
             <MessageButton
               className="invite-cta"
               onClick={async () => {
@@ -286,10 +293,17 @@ function HomePage() {
               </span>
             </MessageButton>
 
-            {/* Виджет */}
+            {/* Виджет (callback) */}
             <MessageButton className="invite-cta" onClick={() => { (window as any).__openTelegramLogin?.(); }}>
               <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
                 <TelegramIcon /> {t('auth.login.telegram')} (виджет)
+              </span>
+            </MessageButton>
+
+            {/* Виджет (redirect) */}
+            <MessageButton className="invite-cta" onClick={() => { (window as any).__openTelegramRedirect?.(); }}>
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+                <TelegramIcon /> {t('auth.login.telegram')} (redirect)
               </span>
             </MessageButton>
           </div>
