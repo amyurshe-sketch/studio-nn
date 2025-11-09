@@ -4,8 +4,10 @@ import './App.css';
 import UsersPage from './UsersPage';
 import ProfilePage from './ProfilePage';
 import LeisurePage from './LeisurePage';
-import LoginPage from './LoginPage';
-import RegisterPage from './RegisterPage';
+// Removed password/username auth pages
+import MessageButton from './components/MessageButton';
+import TelegramLoginModal from './components/TelegramLoginModal';
+import TelegramIcon from './components/icons/TelegramIcon';
 import { useAuth } from './hooks/useAuth';
 import { usePresence } from './hooks/usePresence';
 import { useNotifications } from './hooks/useNotifications';
@@ -13,9 +15,9 @@ import NotificationsModal from './components/NotificationsModal';
 import { ButtonText } from './components/ButtonText';
 import HomePage from './HomePage';
 import StatsPage from './StatsPage';
-import MessageButton from './components/MessageButton';
+import TgCallbackPage from './TgCallbackPage';
 import { useI18n } from './i18n';
-import { API_UNCONFIGURED } from './lib/env';
+import { API_UNCONFIGURED, API_BASE_URL } from './lib/env';
 
 function ProtectedRoute({ children }) {
   const { isAuthenticated, initializing } = useAuth();
@@ -25,7 +27,7 @@ function ProtectedRoute({ children }) {
   }
 
   if (!isAuthenticated) {
-    return <Navigate to="/login" />;
+    return <Navigate to="/" />;
   }
   
   return children;
@@ -38,6 +40,7 @@ function AppShell() {
   const { items: notifItems, ack: ackNotif } = useNotifications();
   const [isNotifOpen, setIsNotifOpen] = useState(false);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const [showTgModal, setShowTgModal] = useState(false);
   const { t, language, setLanguage } = useI18n();
   const [theme, setTheme] = useState(() => {
     if (typeof window === 'undefined') return 'light';
@@ -62,6 +65,12 @@ function AppShell() {
   };
 
   // language is handled by I18nProvider
+
+  // Expose opener for HomePage buttons
+  useEffect(() => {
+    (window as any).__openTelegramLogin = () => setShowTgModal(true);
+    return () => { delete (window as any).__openTelegramLogin; };
+  }, []);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -123,12 +132,14 @@ function AppShell() {
               </div>
               {!isAuthenticated ? (
                 <>
-                  <Link to="/register" className="register-button">
-                    {t('auth.register')}
-                  </Link>
-                  <Link to="/login" className="login-button">
-                    {t('auth.login')}
-                  </Link>
+                  <MessageButton
+                    className="register-button"
+                    onClick={() => setShowTgModal(true)}
+                  >
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+                      <TelegramIcon /> {t('auth.login.telegram')}
+                    </span>
+                  </MessageButton>
                 </>
               ) : (
                 <div className="user-menu">
@@ -193,8 +204,8 @@ function AppShell() {
           <div key={location.pathname} className="page-transition">
             <Routes location={location}>
               <Route path="/" element={<HomePage />} />
-              <Route path="/login" element={<LoginPage />} />
-              <Route path="/register" element={<RegisterPage />} />
+              <Route path="/tg-callback" element={<TgCallbackPage />} />
+              {/* Password auth routes removed */}
               <Route
                 path="/users"
                 element={
@@ -261,6 +272,9 @@ function AppShell() {
             </nav>
           </>
         )}
+
+        {/* Telegram Login Modal */}
+        <TelegramLoginModal open={showTgModal} onClose={() => setShowTgModal(false)} />
     </div>
   );
 }

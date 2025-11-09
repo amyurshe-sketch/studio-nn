@@ -8,7 +8,6 @@ type AuthContextValue = {
   user: User;
   loading: boolean;
   initializing: boolean;
-  login: (name: string, password: string) => Promise<any>;
   logout: () => Promise<void>;
   getAuthHeaders: () => Record<string, string>; // returns {} in cookie mode
   refreshAccessToken: () => Promise<any>; // noop in cookie mode
@@ -139,52 +138,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // No token scheduling in cookie mode
 
-  const login = async (name: string, password: string) => {
-    if (API_UNCONFIGURED) {
-      throw new Error('Backend is not configured. Set VITE_API_BASE_URL and VITE_WS_URL.');
-    }
-    setLoading(true);
-    try {
-      const response = await fetch(`${API_BASE_URL}/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, password }),
-        credentials: 'include',
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.detail || 'Ошибка авторизации');
-      }
-
-      // Ask server for current user via cookie
-      let currentUser: any = null;
-      try {
-        const me = await fetch(`${API_BASE_URL}/me`, { credentials: 'include' });
-        if (me.ok) currentUser = await me.json();
-      } catch {}
-      // Fallback to login response if it contained user info
-      if (!currentUser) {
-        try { currentUser = await response.json(); } catch {}
-      }
-      if (currentUser && (currentUser.user_id || currentUser.id || currentUser.name)) {
-        const mapped = {
-          user_id: currentUser.user_id ?? currentUser.id,
-          name: currentUser.name ?? currentUser.username ?? name,
-          role: currentUser.role ?? 'user',
-        };
-        setUser(mapped);
-        try { wsClient.setAutoReconnect(true); } catch {}
-        wsClient.connect().catch(() => {});
-        return mapped;
-      }
-      throw new Error('Не удалось получить данные пользователя после входа');
-    } catch (error) {
-      throw error;
-    } finally {
-      setLoading(false);
-    }
-  };
+  // login(name,password) removed: Telegram login sets cookies server-side
 
   const logout = useCallback(async () => {
     if (API_UNCONFIGURED) {
@@ -214,7 +168,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       user,
       loading,
       initializing,
-      login,
       logout,
       getAuthHeaders,
       refreshAccessToken,

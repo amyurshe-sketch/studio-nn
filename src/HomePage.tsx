@@ -3,6 +3,9 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from './hooks/useAuth';
 import './HomePage.css';
 import { useI18n } from './i18n';
+import { API_BASE_URL } from './lib/env';
+import MessageButton from './components/MessageButton';
+import TelegramIcon from './components/icons/TelegramIcon';
 
 // Type shape for particles used in canvas animation
 type Particle = {
@@ -164,8 +167,38 @@ function HomePage() {
             <p className="hero-description">{t('home.hero.desc')}</p>
 
             <div className="hero-cta-group">
-              <Link to="/register" className="hero-primary-cta">{t('home.hero.cta.join')}</Link>
-              <Link to="/login" className="hero-secondary-cta">{t('home.hero.cta.login')}</Link>
+              <MessageButton
+                className="hero-primary-cta"
+                onClick={async () => {
+                  try {
+                    const res = await fetch(`${API_BASE_URL}/auth/telegram/send-login`, {
+                      method: 'POST',
+                      credentials: 'include',
+                    }).catch(() => null as any);
+                    const envBot = (import.meta as any).env?.VITE_TG_BOT_USERNAME || 'john_helper_bot';
+                    let bot = envBot;
+                    let oauthUrl: string | null = null;
+                    if (res && res.ok) {
+                      const j = await res.json();
+                      if (j?.bot_username) bot = j.bot_username;
+                      if (j?.oauth_url) oauthUrl = j.oauth_url;
+                      if (j && j.ok === false) {
+                        const msg = `Не удалось отправить кнопку входа.\nПроверьте, что вы написали боту /start и TELEGRAM_CHAT_ID верный.\n${j.error ? 'Подробности: ' + j.error : ''}`;
+                        alert(msg);
+                      }
+                    }
+                    if (!oauthUrl) {
+                      const origin = window.location.origin.replace(/\/$/, '');
+                      oauthUrl = `https://oauth.telegram.org/auth?bot=${encodeURIComponent(bot)}&origin=${encodeURIComponent(origin)}&embed=1&request_access=write&return_to=${encodeURIComponent(origin + '/tg-callback')}`;
+                    }
+                    window.open(oauthUrl, '_blank');
+                  } catch {}
+                }}
+              >
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+                  <TelegramIcon /> {t('auth.login.telegram')}
+                </span>
+              </MessageButton>
             </div>
           </div>
 
@@ -213,8 +246,38 @@ function HomePage() {
             <p>{t('home.invite.text')}</p>
           </div>
           <div className="invite-actions">
-            <Link to="/register" className="invite-cta">{t('home.invite.cta.create')}</Link>
-            <Link to="/login" className="invite-link">{t('home.invite.cta.login')}</Link>
+            <MessageButton
+              className="invite-cta"
+              onClick={async () => {
+                try {
+                  const res = await fetch(`${API_BASE_URL}/auth/telegram/send-login`, {
+                    method: 'POST',
+                    credentials: 'include',
+                  }).catch(() => null as any);
+                  const envBot = (import.meta as any).env?.VITE_TG_BOT_USERNAME || 'john_helper_bot';
+                  let bot = envBot;
+                  let oauthUrl: string | null = null;
+                  if (res && res.ok) {
+                    const j = await res.json();
+                    if (j?.bot_username) bot = j.bot_username;
+                    if (j?.oauth_url) oauthUrl = j.oauth_url;
+                    if (j && j.ok === false) {
+                      const msg = `Не удалось отправить кнопку входа.\nПроверьте, что вы написали боту /start и TELEGRAM_CHAT_ID верный.\n${j.error ? 'Подробности: ' + j.error : ''}`;
+                      alert(msg);
+                    }
+                  }
+                  if (!oauthUrl) {
+                    const origin = window.location.origin.replace(/\/$/, '');
+                    oauthUrl = `https://oauth.telegram.org/auth?bot=${encodeURIComponent(bot)}&origin=${encodeURIComponent(origin)}&embed=1&request_access=write&return_to=${encodeURIComponent(origin + '/tg-callback')}`;
+                  }
+                  window.open(oauthUrl, '_blank');
+                } catch {}
+              }}
+            >
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+                <TelegramIcon /> {t('auth.login.telegram')}
+              </span>
+            </MessageButton>
           </div>
         </div>
       </section>
