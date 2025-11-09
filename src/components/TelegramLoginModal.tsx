@@ -23,7 +23,10 @@ export default function TelegramLoginModal({ open, onClose, botUsername }: Props
   useEffect(() => {
     if (!open) return;
     if (!hostRef.current) return;
-    if (!bot) return;
+    if (!bot) {
+      setLoadError('Бот не настроен на фронтенде (VITE_TG_BOT_USERNAME).');
+      return;
+    }
 
     window.onTelegramAuth = async (user: any) => {
       try {

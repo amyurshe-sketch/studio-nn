@@ -166,7 +166,7 @@ function HomePage() {
             <h1 className="hero-title">{t('home.hero.title')}</h1>
             <p className="hero-description">{t('home.hero.desc')}</p>
 
-            <div className="hero-cta-group">
+            <div className="hero-cta-group" style={{ display: 'flex', gap: 12 }}>
               <MessageButton
                 className="hero-primary-cta"
                 onClick={async () => {
@@ -197,6 +197,13 @@ function HomePage() {
               >
                 <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
                   <TelegramIcon /> {t('auth.login.telegram')}
+                </span>
+              </MessageButton>
+
+              {/* Вход через виджет (встроенный Telegram Login Widget) */}
+              <MessageButton className="hero-secondary-cta" onClick={() => { (window as any).__openTelegramLogin?.(); }}>
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+                  <TelegramIcon /> {t('auth.login.telegram')} (виджет)
                 </span>
               </MessageButton>
             </div>
@@ -245,7 +252,7 @@ function HomePage() {
             <h2>{t('home.invite.title')}</h2>
             <p>{t('home.invite.text')}</p>
           </div>
-          <div className="invite-actions">
+          <div className="invite-actions" style={{ display: 'flex', gap: 12 }}>
             <MessageButton
               className="invite-cta"
               onClick={async () => {
@@ -276,6 +283,13 @@ function HomePage() {
             >
               <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
                 <TelegramIcon /> {t('auth.login.telegram')}
+              </span>
+            </MessageButton>
+
+            {/* Виджет */}
+            <MessageButton className="invite-cta" onClick={() => { (window as any).__openTelegramLogin?.(); }}>
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+                <TelegramIcon /> {t('auth.login.telegram')} (виджет)
               </span>
             </MessageButton>
           </div>
