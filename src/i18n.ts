@@ -11,7 +11,7 @@ const resources: Resources = {
     'nav.users': 'Пользователи',
     'nav.profile': 'Профиль',
     'nav.leisure': 'Досуг',
-    'auth.register': 'Зарегистрироваться',
+    'auth.register': 'начать',
     'auth.login': 'Войти',
     
     'auth.logout': 'Выйти',
