@@ -3,6 +3,7 @@ import { useAuth } from './hooks/useAuth';
 import { useNews } from './hooks/useNews';
 import './leisure-styles.css';
 import { useI18n, getLocale } from './i18n';
+import { API_BASE_URL } from './lib/env';
 
 function LeisurePage() {
   const { language, t } = useI18n();
@@ -17,12 +18,28 @@ function LeisurePage() {
   
   const [leisureTheme, setLeisureTheme] = useState('light');
   const [themeCycle] = useState(['light', 'dark', 'night']);
+  const [quote, setQuote] = useState<{ text: string; author?: string } | null>(null);
 
   // Автоматическая синхронизация с глобальной темой при загрузке
   useEffect(() => {
     const globalTheme = document.documentElement.getAttribute('data-theme') || 'light';
     setLeisureTheme(globalTheme);
   }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const r = await fetch(`${API_BASE_URL}/quotes/random?lang=${encodeURIComponent(language)}` as any, { credentials: 'include' });
+        if (!r.ok) throw new Error('Failed to load quote');
+        const j = await r.json();
+        if (!cancelled) setQuote(j);
+      } catch {
+        if (!cancelled) setQuote(null);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [language]);
 
   const toggleLeisureTheme = () => {
     setLeisureTheme(prev => {
@@ -198,8 +215,8 @@ function LeisurePage() {
         <div className="motivation-section">
           <h3>{t('leisure.motivation.title')}</h3>
           <blockquote className="motivation-quote">
-            {t('leisure.motivation.quote')}
-            <footer>{t('leisure.motivation.author')}</footer>
+            {quote?.text || t('leisure.motivation.quote')}
+            <footer>{quote?.author || t('leisure.motivation.author')}</footer>
           </blockquote>
         </div>
       </div>

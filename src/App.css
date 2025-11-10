@@ -65,6 +65,15 @@ a:hover {
   color: var(--color-accent);
 }
 
+/* Ensure ButtonText stays readable on light theme hover (Brave issue) */
+.btn-text {
+  color: var(--color-text);
+}
+.btn-text:hover,
+.btn-text:focus-visible {
+  color: var(--color-accent);
+}
+
 button {
   font-family: var(--font-sans);
   border: none;
@@ -493,7 +502,6 @@ button {
 }
 
 .users-page,
-.profile-page,
 .leisure-page,
 .login-page,
 .register-page {
@@ -538,7 +546,6 @@ button {
 
 
 [data-theme='dark'] .users-page,
-[data-theme='dark'] .profile-page,
 [data-theme='dark'] .leisure-page,
 [data-theme='dark'] .login-page,
 [data-theme='dark'] .register-page {
@@ -835,6 +842,27 @@ button {
 [data-theme='dark'] .filter-dropdown__option.is-active {
   background: rgba(99, 102, 241, 0.22);
   color: rgba(226, 232, 240, 0.98);
+}
+
+/* Dark theme panel for filter dropdown for better contrast */
+[data-theme='dark'] .filter-dropdown__menu {
+  background: rgba(17, 24, 39, 0.96);
+  border-color: rgba(99, 102, 241, 0.26);
+  box-shadow: 0 28px 56px rgba(2, 6, 23, 0.7);
+}
+
+/* Ensure user list text has high contrast in dark theme */
+[data-theme='dark'] .user-row__name,
+[data-theme='dark'] .filter-dropdown__option,
+[data-theme='dark'] .no-users,
+[data-theme='dark'] .online-count,
+[data-theme='dark'] .users-loading-text {
+  color: rgba(226, 232, 240, 0.96);
+}
+
+/* Improve contrast of index too */
+[data-theme='dark'] .user-row__index {
+  color: rgba(203, 213, 225, 0.85);
 }
 
 .users-list {
@@ -1160,6 +1188,44 @@ button {
 
 [data-theme='dark'] .last-update {
   color: rgba(148, 163, 184, 0.68);
+}
+
+/* UsersPage: CSS-only hover window near username (mirrors LeisurePage hover behavior) */
+.users-page .user-name-wrapper { position: relative; display: inline-block; }
+.users-page .user-name-hover { font-weight: 700; color: var(--color-text); }
+.users-page .user-hover-card {
+  position: absolute;
+  left: 0;
+  top: calc(100% + 6px);
+  width: 260px;
+  min-height: 90px;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.96);
+  color: #0f172a; /* slate-900 */
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  border-radius: 12px;
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.18);
+  z-index: 8;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-6px);
+  pointer-events: none;
+  transition: opacity 200ms ease, transform 200ms ease, visibility 200ms ease;
+}
+.users-page .user-name-hover:hover + .user-hover-card,
+.users-page .user-hover-card:hover {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+/* Dark theme variant for hover card */
+[data-theme='dark'] .users-page .user-hover-card {
+  background: #0b1220;
+  color: #f1f5f9;
+  border-color: rgba(255, 255, 255, 0.22);
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.06) inset;
 }
 
 
@@ -1597,82 +1663,6 @@ button {
   line-height: 1.5;
 }
 
-.profile-card {
-  background: var(--color-surface);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-card);
-  padding: 40px;
-  display: grid;
-  gap: 32px;
-}
-
-.profile-header {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 12px;
-  text-align: center;
-}
-
-.profile-header h2 {
-  margin: 0;
-  font-family: var(--font-display);
-  font-size: 2.2rem;
-  color: rgba(15, 23, 42, 0.96);
-}
-
-.profile-avatar {
-  width: 72px;
-  height: 72px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  font-size: 2.2rem;
-  background: rgba(17, 24, 39, 0.08);
-}
-
-.user-role {
-  font-weight: 600;
-  color: rgba(17, 24, 39, 0.82);
-}
-
-.profile-info {
-  display: grid;
-  gap: 14px;
-}
-
-.info-item {
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 12px 0;
-  border-bottom: 1px solid var(--color-border);
-}
-
-.info-label {
-  font-weight: 600;
-  color: rgba(30, 41, 59, 0.88);
-}
-
-.info-value {
-  color: rgba(17, 24, 39, 0.7);
-  font-weight: 500;
-}
-
-.info-item:last-child {
-  border-bottom: none;
-}
-
-.special-role .info-value {
-  color: #db2777;
-}
-
-.profile-stats {
-  padding: 24px;
-  border-radius: var(--radius-md);
-  background: var(--color-surface-alt);
-}
 
 .profile-stats h3 {
   margin-top: 0;
@@ -1709,6 +1699,22 @@ button {
 .stat-label {
   color: rgba(71, 85, 105, 0.9);
   font-size: 0.92rem;
+}
+
+/* Dark theme for system stats */
+[data-theme='dark'] .stat-item {
+  background: rgba(30, 41, 59, 0.6);
+  box-shadow: 0 18px 36px rgba(2, 6, 23, 0.5);
+  border: 1px solid rgba(99, 102, 241, 0.2);
+}
+[data-theme='dark'] .stat-item.online {
+  border-color: rgba(34, 197, 94, 0.32);
+}
+[data-theme='dark'] .stat-number {
+  color: rgba(226, 232, 240, 0.96);
+}
+[data-theme='dark'] .stat-label {
+  color: rgba(203, 213, 225, 0.86);
 }
 
 .special-notice {
@@ -2018,9 +2024,6 @@ button {
 }
 
 /* Аватар и вторичные плашки — светлый фон → тёмный мягкий фон */
-[data-theme='dark'] .profile-avatar {
-  background: rgba(148, 163, 184, 0.18);
-}
 
 /* «Вторичная» кнопка: делаем адекватный фон в тёмной */
 [data-theme='dark'] .action-button.secondary {
@@ -2051,6 +2054,27 @@ button {
 [data-theme='dark'] .profile-stats {
   background: rgba(30, 41, 59, 0.55);
 }
+
+/* Inline editor fields in ProfilePage: ensure high contrast in both themes */
+.profile-page input,
+.profile-page select,
+.profile-page textarea {
+  background: #ffffff;
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+}
+
+[data-theme='dark'] .profile-page input,
+[data-theme='dark'] .profile-page select,
+[data-theme='dark'] .profile-page textarea {
+  background: rgba(30, 41, 59, 0.85);
+  color: rgba(226, 232, 240, 0.98);
+  border-color: rgba(148, 163, 184, 0.38);
+}
+
+/* Improve contrast of profile labels/values in light theme as well */
+.profile-page .info-label { color: rgba(17, 24, 39, 0.9); }
+.profile-page .info-value { color: rgba(17, 24, 39, 0.82); }
 
 /* Theme transition polish */
 @media (prefers-reduced-motion: no-preference) {

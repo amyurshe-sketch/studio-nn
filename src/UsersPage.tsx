@@ -3,10 +3,11 @@ import { useApiData } from './hooks/useApiData';
 import { useAuth } from './hooks/useAuth';
 import { wsClient } from './lib/wsClient';
 import { API_BASE_URL } from './lib/env';
-import UserCard from './components/UserCard';
+// Render users as a simple list (no cards)
+import MessageButton from './components/MessageButton';
+import MessageModal from './components/MessageModal';
 import { Link, useNavigate } from 'react-router-dom';
 import { ButtonText } from './components/ButtonText';
-import MessageButton from './components/MessageButton';
 import { useI18n } from './i18n';
 
 function UsersPage() {
@@ -34,11 +35,25 @@ function UsersPage() {
   const [allLoading, setAllLoading] = useState(false);
   const [allError, setAllError] = useState(null);
 
-  const handleSendNotification = () => {};
-
-  const handleNotificationSubmit = async () => {};
-
-  const handleCloseModal = () => {};
+  // Simple messaging modal state for list items
+  const [pmOpen, setPmOpen] = useState(false);
+  const [pmToName, setPmToName] = useState<string>('');
+  const [pmToId, setPmToId] = useState<number | null>(null);
+  const openPm = useCallback((id: number, name: string) => { setPmToId(id); setPmToName(name); setPmOpen(true); }, []);
+  const closePm = useCallback(() => { setPmOpen(false); }, []);
+  const handlePmSend = useCallback(async (payload: { to: string; subject: string; body: string }) => {
+    const text = payload.body?.trim();
+    if (!text || !pmToId) return;
+    try {
+      if (!authUser?.user_id) return;
+      if (!wsClient.isReady()) {
+        await wsClient.connect().catch(() => {});
+      }
+      await wsClient.request('notifications.send', { receiver_id: pmToId, message_text: text });
+    } catch (e) {
+      try { console.error('Send notification error', e); } catch {}
+    }
+  }, [authUser?.user_id, pmToId]);
 
   useEffect(() => {
     if (!loading) {
@@ -255,6 +270,45 @@ function UsersPage() {
     }
   }, [showOnlineOnly, genderFilter, loading, pagination]);
 
+  // Profile cache for hover content (user_profiles)
+  const profileCacheRef = useRef<Map<number, any>>(new Map());
+  const [profilesTick, setProfilesTick] = useState(0); // force re-render when cache updates
+  const requestProfile = useCallback(async (uid: number) => {
+    if (!uid) return null;
+    if (profileCacheRef.current.has(uid)) return profileCacheRef.current.get(uid);
+    try {
+      if (!wsClient.isReady()) {
+        await wsClient.connect().catch(() => {});
+      }
+      let profile: any = await wsClient.request('user.profile', { user_id: uid });
+      // Try to enrich with REST profile (about, avatar_url, etc.) if available
+      try {
+        const r = await fetch(`${API_BASE_URL}/profiles/${uid}` as any, { credentials: 'include' });
+        if (r.ok) {
+          const extra = await r.json();
+          profile = Object.assign({}, profile, extra);
+        }
+      } catch {}
+      profileCacheRef.current.set(uid, profile);
+      setProfilesTick((v) => v + 1);
+      return profile;
+    } catch {
+      return null;
+    }
+  }, []);
+
+  // Live presence updates via WS
+  useEffect(() => {
+    const off = wsClient.on('presence.update', (p: any) => {
+      const uid = Number(p?.user_id);
+      const flag = !!p?.is_online;
+      if (!uid) return;
+      setAllUsers(prev => prev && prev.length ? prev.map(u => (u.id === uid ? { ...u, is_online: flag } : u)) : prev);
+      setAggregatedUsers(prev => prev && prev.length ? prev.map(u => (u.id === uid ? { ...u, is_online: flag } : u)) : prev);
+    });
+    return () => { try { off && off(); } catch {} };
+  }, []);
+
   if (error || allError) return <div className="error">{t('profile.error')} {allError || error}</div>;
 
   return (
@@ -318,25 +372,82 @@ function UsersPage() {
           </div>
         </div>
 
-        <div
-          key={`${showOnlineOnly}-${genderFilter}-${filteredUsers.length}`}
-          className="users-list"
-          data-animate={(!loading && filteredUsers.length > 0) ? 'true' : 'false'}
-        >
+        <div key={`${showOnlineOnly}-${genderFilter}-${filteredUsers.length}`} className="users-list" data-animate={(!loading && filteredUsers.length > 0) ? 'true' : 'false'}>
           {displayedUsers.length === 0 ? (
             <div className="no-users">{t('users.empty')}</div>
           ) : (
-            displayedUsers.map((user, index) => (
-              <UserCard 
-                key={user.id} 
-                name={user.name} 
-                age={user.age} 
-                gender={user.gender}
-                is_online={user.is_online}
-                userId={user.id}
-                rowIndex={index}
-              />
-            ))
+            <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'grid', gap: 0 }}>
+              {displayedUsers.map((u, index) => {
+                const isCurrent = authUser?.user_id === u.id;
+                return (
+                  <li key={u.id} style={{
+                    display: 'flex', alignItems: 'center', gap: 8,
+                    padding: '6px 0',
+                    borderBottom: '1px solid var(--color-border)'
+                  }}>
+                    <span style={{ minWidth: 24, textAlign: 'right', color: 'var(--color-text)', fontWeight: 700 }}>{index + 1}.</span>
+                    <span
+                      className="user-name-wrapper"
+                      style={{ position: 'relative', display: 'inline-block' }}
+                      onMouseEnter={() => { requestProfile(u.id); }}
+                    >
+                      <span className="user-name-hover" style={{ fontWeight: 700, color: 'var(--color-text)', cursor: 'default' }}>
+                        {u.name}
+                      </span>
+                      <div className="user-hover-card" aria-hidden="true">
+                        {(() => {
+                          const p = profileCacheRef.current.get(u.id) || {};
+                          const gender = p.gender || u.gender || '';
+                          const age = (p.age || p.age === 0) ? p.age : '';
+                          const about = p.about || '';
+                          const url: string | undefined = p.avatar_url;
+                          const fallbackEmoji = gender === 'мужской' ? '👨' : (gender === 'женский' ? '👩' : '👤');
+                          return (
+                            <div style={{ display: 'flex', gap: 12 }}>
+                              <div style={{
+                                width: 44, height: 44, borderRadius: 8,
+                                background: 'var(--color-surface-alt)', border: '1px solid var(--color-border)',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center', flex: '0 0 auto'
+                              }}>
+                                {url && typeof url === 'string' && url.startsWith('emoji:') ? (
+                                  <span style={{ fontSize: 24 }}>{url.replace('emoji:', '') || fallbackEmoji}</span>
+                                ) : url && typeof url === 'string' && /^https?:\/\//i.test(url) ? (
+                                  <img src={url} alt="avatar" style={{ width: 40, height: 40, borderRadius: 6, objectFit: 'cover' }} />
+                                ) : (
+                                  <span style={{ fontSize: 24 }}>{fallbackEmoji}</span>
+                                )}
+                              </div>
+                              <div style={{ display: 'grid', gridTemplateColumns: '80px 1fr', columnGap: 8, rowGap: 6, fontSize: 14 }}>
+                                <div style={{ color: 'var(--color-muted)' }}>Пол</div>
+                                <div>{gender || ''}</div>
+                                <div style={{ color: 'var(--color-muted)' }}>Возраст</div>
+                                <div>{age}</div>
+                                <div style={{ color: 'var(--color-muted)' }}>О себе</div>
+                                <div style={{ maxWidth: 360, overflowWrap: 'anywhere' }}>{about}</div>
+                              </div>
+                            </div>
+                          );
+                        })()}
+                      </div>
+                    </span>
+                    <span style={{
+                      marginLeft: 'auto', fontSize: 12, fontWeight: 700, letterSpacing: '0.12em',
+                      color: u.is_online ? 'var(--color-success)' : 'var(--color-muted)'
+                    }}>
+                      {u.is_online ? 'online' : 'offline'}
+                    </span>
+                    {!isCurrent && (
+                      <MessageButton
+                        onClick={() => openPm(u.id, u.name)}
+                        style={{ padding: '4px 8px', borderRadius: 8, fontSize: 12, lineHeight: '18px' }}
+                      >
+                        написать
+                      </MessageButton>
+                    )}
+                  </li>
+                );
+              })}
+            </ul>
           )}
         </div>
 
@@ -377,7 +488,16 @@ function UsersPage() {
         </div>
       </div>
 
-      {/* Messaging modal removed */}
+      {/* Messaging modal for simple list */}
+      <MessageModal
+        open={pmOpen}
+        onClose={closePm}
+        onSend={handlePmSend}
+        initialTo={pmToName}
+        lockTo={true}
+        dimBackground={true}
+        closeOnBackdrop={true}
+      />
     </div>
   );
 }

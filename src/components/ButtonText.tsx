@@ -25,7 +25,7 @@ export function ButtonText({
       {...props}
       onClick={onClick}
       className={[
-        "group inline-flex items-center gap-1",
+        "btn-text group inline-flex items-center gap-1",
         "font-semibold text-slate-800 dark:text-slate-100",
         "tracking-wide uppercase text-sm",
         "bg-transparent border-none cursor-pointer",

@@ -3,9 +3,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from './hooks/useAuth';
 import './HomePage.css';
 import { useI18n } from './i18n';
-import { API_BASE_URL } from './lib/env';
 import MessageButton from './components/MessageButton';
-import TelegramIcon from './components/icons/TelegramIcon';
+import { ButtonText } from './components/ButtonText';
 
 // Type shape for particles used in canvas animation
 type Particle = {
@@ -166,53 +165,11 @@ function HomePage() {
             <h1 className="hero-title">{t('home.hero.title')}</h1>
             <p className="hero-description">{t('home.hero.desc')}</p>
 
-            <div className="hero-cta-group" style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-              <MessageButton
-                className="hero-primary-cta"
-                onClick={async () => {
-                  try {
-                    const res = await fetch(`${API_BASE_URL}/auth/telegram/send-login`, {
-                      method: 'POST',
-                      credentials: 'include',
-                    }).catch(() => null as any);
-                    const envBot = (import.meta as any).env?.VITE_TG_BOT_USERNAME || 'john_helper_bot';
-                    let bot = envBot;
-                    let oauthUrl: string | null = null;
-                    if (res && res.ok) {
-                      const j = await res.json();
-                      if (j?.bot_username) bot = j.bot_username;
-                      if (j?.oauth_url) oauthUrl = j.oauth_url;
-                      if (j && j.ok === false) {
-                        const msg = `Не удалось отправить кнопку входа.\nПроверьте, что вы написали боту /start и TELEGRAM_CHAT_ID верный.\n${j.error ? 'Подробности: ' + j.error : ''}`;
-                        alert(msg);
-                      }
-                    }
-                    if (!oauthUrl) {
-                      const origin = window.location.origin.replace(/\/$/, '');
-                      oauthUrl = `https://oauth.telegram.org/auth?bot=${encodeURIComponent(bot)}&origin=${encodeURIComponent(origin)}&embed=1&request_access=write&return_to=${encodeURIComponent(origin + '/tg-callback')}`;
-                    }
-                    window.open(oauthUrl, '_blank');
-                  } catch {}
-                }}
-              >
-                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
-                  <TelegramIcon /> {t('auth.login.telegram')}
-                </span>
+            <div className="hero-cta-group" style={{ display: 'flex', gap: 12, flexWrap: 'wrap', alignItems: 'center' }}>
+              <MessageButton className="hero-primary-cta" onClick={() => navigate('/register')}>
+                {t('auth.register')}
               </MessageButton>
-
-              {/* Вход через виджет (callback) */}
-              <MessageButton className="hero-secondary-cta" onClick={() => { (window as any).__openTelegramLogin?.(); }}>
-                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
-                  <TelegramIcon /> {t('auth.login.telegram')} (виджет)
-                </span>
-              </MessageButton>
-
-              {/* Вход через виджет (redirect to /tg-callback) */}
-              <MessageButton className="hero-secondary-cta" onClick={() => { (window as any).__openTelegramRedirect?.(); }}>
-                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
-                  <TelegramIcon /> {t('auth.login.telegram')} (redirect)
-                </span>
-              </MessageButton>
+              <ButtonText as={Link} to="/login">вход</ButtonText>
             </div>
           </div>
 
@@ -259,53 +216,11 @@ function HomePage() {
             <h2>{t('home.invite.title')}</h2>
             <p>{t('home.invite.text')}</p>
           </div>
-          <div className="invite-actions" style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-            <MessageButton
-              className="invite-cta"
-              onClick={async () => {
-                try {
-                  const res = await fetch(`${API_BASE_URL}/auth/telegram/send-login`, {
-                    method: 'POST',
-                    credentials: 'include',
-                  }).catch(() => null as any);
-                  const envBot = (import.meta as any).env?.VITE_TG_BOT_USERNAME || 'john_helper_bot';
-                  let bot = envBot;
-                  let oauthUrl: string | null = null;
-                  if (res && res.ok) {
-                    const j = await res.json();
-                    if (j?.bot_username) bot = j.bot_username;
-                    if (j?.oauth_url) oauthUrl = j.oauth_url;
-                    if (j && j.ok === false) {
-                      const msg = `Не удалось отправить кнопку входа.\nПроверьте, что вы написали боту /start и TELEGRAM_CHAT_ID верный.\n${j.error ? 'Подробности: ' + j.error : ''}`;
-                      alert(msg);
-                    }
-                  }
-                  if (!oauthUrl) {
-                    const origin = window.location.origin.replace(/\/$/, '');
-                    oauthUrl = `https://oauth.telegram.org/auth?bot=${encodeURIComponent(bot)}&origin=${encodeURIComponent(origin)}&embed=1&request_access=write&return_to=${encodeURIComponent(origin + '/tg-callback')}`;
-                  }
-                  window.open(oauthUrl, '_blank');
-                } catch {}
-              }}
-            >
-              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
-                <TelegramIcon /> {t('auth.login.telegram')}
-              </span>
+          <div className="invite-actions" style={{ display: 'flex', gap: 12, flexWrap: 'wrap', alignItems: 'center' }}>
+            <MessageButton className="invite-cta" onClick={() => navigate('/register')}>
+              {t('auth.register')}
             </MessageButton>
-
-            {/* Виджет (callback) */}
-            <MessageButton className="invite-cta" onClick={() => { (window as any).__openTelegramLogin?.(); }}>
-              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
-                <TelegramIcon /> {t('auth.login.telegram')} (виджет)
-              </span>
-            </MessageButton>
-
-            {/* Виджет (redirect) */}
-            <MessageButton className="invite-cta" onClick={() => { (window as any).__openTelegramRedirect?.(); }}>
-              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
-                <TelegramIcon /> {t('auth.login.telegram')} (redirect)
-              </span>
-            </MessageButton>
+            <ButtonText as={Link} to="/login">вход</ButtonText>
           </div>
         </div>
       </section>

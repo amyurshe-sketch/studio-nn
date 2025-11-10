@@ -1,14 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate, Link, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, Link, useLocation, useNavigate } from 'react-router-dom';
 import './App.css';
 import UsersPage from './UsersPage';
 import ProfilePage from './ProfilePage';
 import LeisurePage from './LeisurePage';
 // Removed password/username auth pages
 import MessageButton from './components/MessageButton';
-import TelegramLoginModal from './components/TelegramLoginModal';
-import TelegramRedirectWidgetModal from './components/TelegramRedirectWidgetModal';
-import TelegramIcon from './components/icons/TelegramIcon';
+// Telegram auth removed
 import { useAuth } from './hooks/useAuth';
 import { usePresence } from './hooks/usePresence';
 import { useNotifications } from './hooks/useNotifications';
@@ -16,7 +14,9 @@ import NotificationsModal from './components/NotificationsModal';
 import { ButtonText } from './components/ButtonText';
 import HomePage from './HomePage';
 import StatsPage from './StatsPage';
-import TgCallbackPage from './TgCallbackPage';
+import RegisterPage from './RegisterPage';
+import LoginPage from './LoginPage';
+// Telegram callback removed
 import { useI18n } from './i18n';
 import { API_UNCONFIGURED, API_BASE_URL } from './lib/env';
 
@@ -36,13 +36,13 @@ function ProtectedRoute({ children }) {
 
 function AppShell() {
   const { isAuthenticated, user, logout } = useAuth();
+  const navigate = useNavigate();
   // Messaging removed; presence via WS heartbeat
   usePresence();
   const { items: notifItems, ack: ackNotif } = useNotifications();
   const [isNotifOpen, setIsNotifOpen] = useState(false);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
-  const [showTgModal, setShowTgModal] = useState(false);
-  const [showTgRedirectModal, setShowTgRedirectModal] = useState(false);
+  // Telegram modals removed
   const { t, language, setLanguage } = useI18n();
   const [theme, setTheme] = useState(() => {
     if (typeof window === 'undefined') return 'light';
@@ -68,12 +68,7 @@ function AppShell() {
 
   // language is handled by I18nProvider
 
-  // Expose opener for HomePage buttons
-  useEffect(() => {
-    (window as any).__openTelegramLogin = () => setShowTgModal(true);
-    (window as any).__openTelegramRedirect = () => setShowTgRedirectModal(true);
-    return () => { delete (window as any).__openTelegramLogin; };
-  }, []);
+  // Telegram openers removed
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -157,14 +152,15 @@ function AppShell() {
               </div>
               {!isAuthenticated ? (
                 <>
-                  <MessageButton
-                    className="register-button"
-                    onClick={() => setShowTgModal(true)}
-                  >
-                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
-                      <TelegramIcon /> {t('auth.login.telegram')}
-                    </span>
-                  </MessageButton>
+                  <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+                    <ButtonText as={Link} to="/login">вход</ButtonText>
+                    <MessageButton
+                      className="register-button"
+                      onClick={() => navigate('/register')}
+                    >
+                      {t('auth.register')}
+                    </MessageButton>
+                  </div>
                 </>
               ) : (
                 <div className="user-menu">
@@ -229,7 +225,9 @@ function AppShell() {
           <div key={location.pathname} className="page-transition">
             <Routes location={location}>
               <Route path="/" element={<HomePage />} />
-              <Route path="/tg-callback" element={<TgCallbackPage />} />
+              <Route path="/register" element={<RegisterPage />} />
+              <Route path="/login" element={<LoginPage />} />
+              {/* Telegram callback route removed */}
               {/* Password auth routes removed */}
               <Route
                 path="/users"
@@ -298,9 +296,7 @@ function AppShell() {
           </>
         )}
 
-        {/* Telegram Login Modal */}
-        <TelegramLoginModal open={showTgModal} onClose={() => setShowTgModal(false)} />
-        <TelegramRedirectWidgetModal open={showTgRedirectModal} onClose={() => setShowTgRedirectModal(false)} />
+        {/* Telegram login UI removed */}
     </div>
   );
 }

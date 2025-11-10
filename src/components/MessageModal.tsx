@@ -43,6 +43,11 @@ export default function MessageModal({
     return () => window.removeEventListener("keydown", onKey);
   }, [open, onClose]);
 
+  // Keep "to" in sync when initialTo changes (e.g., opening for another user)
+  useEffect(() => {
+    setTo(initialTo || "");
+  }, [initialTo, open]);
+
   if (!open) return null;
 
   const bodyLen = body.length;
