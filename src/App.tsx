@@ -113,28 +113,6 @@ function AppShell() {
                   <button
                     type="button"
                     className="header-control-button"
-                    onClick={async () => {
-                      try {
-                        const res = await fetch(`${API_BASE_URL}/self-test`, { credentials: 'include' });
-                        const j = await res.json();
-                        alert(
-                          `${t('test.run')}:\n` +
-                          `API: ${j.api_ok ? 'OK' : 'FAIL'}\n` +
-                          `DB: ${j.db_ok ? 'OK' : 'FAIL'}\n` +
-                          `Redis: ${j.redis_ok === null ? 'N/A' : (j.redis_ok ? 'OK' : 'FAIL')}\n` +
-                          `${language === 'ru' ? 'Авторизован' : 'Auth'}: ${j.authenticated ? 'YES' : 'NO'}`
-                        );
-                      } catch (e) {
-                        alert('Self-test failed to run');
-                      }
-                    }}
-                    title={t('test.run')}
-                  >
-                    🧪
-                  </button>
-                  <button
-                    type="button"
-                    className="header-control-button"
                     onClick={toggleLanguage}
                     title={language === 'ru' ? t('header.lang.tooltip_en') : t('header.lang.tooltip_ru')}
                   >

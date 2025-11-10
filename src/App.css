@@ -325,6 +325,11 @@ button {
   .mobile-nav-toggle { display: inline-flex; }
   .logout-desktop { display: none !important; }
 }
+/* Slightly widen mobile breakpoint to make burger visible on more phones/tablets */
+@media (max-width: 992px) {
+  .mobile-nav-toggle { display: inline-flex; }
+  .logout-desktop { display: none !important; }
+}
 
 .nav-link,
 .btn-nav {
