@@ -331,6 +331,22 @@ button {
   .logout-desktop { display: none !important; }
 }
 
+/* Mobile header tightening so long text fits (e.g., "Зарегистрироваться") */
+@media (max-width: 520px) {
+  .header-content { padding: 0 12px; }
+  .header-left { gap: 16px; }
+  .logo { font-size: 1.45rem; }
+  .header-right { gap: 8px; }
+  .register-button { padding: 8px 16px; font-size: 0.92rem; }
+  .login-button { padding: 8px 0; }
+}
+
+@media (max-width: 380px) {
+  .header-content { padding: 0 10px; }
+  .logo { font-size: 1.35rem; }
+  .register-button { padding: 6px 14px; font-size: 0.88rem; }
+}
+
 .nav-link,
 .btn-nav {
   display: inline-flex;
