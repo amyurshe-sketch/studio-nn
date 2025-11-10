@@ -7,9 +7,12 @@ import AnswerModal from './components/AnswerModal';
 import NotificationsModal from './components/NotificationsModal';
 import { useNotifications } from './hooks/useNotifications';
 import ThreadModal from './components/ThreadModal';
+import { API_BASE_URL } from './lib/env';
+import { useI18n } from './i18n';
 
 
 function StatsPage() {
+  const { t, language } = useI18n();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isAnswerOpen, setIsAnswerOpen] = useState(false);
   const [isThreadOpen, setIsThreadOpen] = useState(false);
@@ -27,6 +30,22 @@ function StatsPage() {
     // В реальном проекте можно отправить на API; здесь просто лог
     try { console.log('MessageModal send:', payload); } catch {}
   }, []);
+
+  const runSelfTest = useCallback(async () => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/self-test`, { credentials: 'include' });
+      const j = await res.json();
+      alert(
+        `${t('test.run')}:\n` +
+        `API: ${j.api_ok ? 'OK' : 'FAIL'}\n` +
+        `DB: ${j.db_ok ? 'OK' : 'FAIL'}\n` +
+        `Redis: ${j.redis_ok === null ? 'N/A' : (j.redis_ok ? 'OK' : 'FAIL')}\n` +
+        `${language === 'ru' ? 'Авторизован' : 'Auth'}: ${j.authenticated ? 'YES' : 'NO'}`
+      );
+    } catch (e) {
+      alert('Self-test failed to run');
+    }
+  }, [t, language]);
 
   return (
     <div className="stats-page">
@@ -53,6 +72,10 @@ function StatsPage() {
         <div className="stats-page__preview-item">
           <span className="stats-page__preview-label">Notifications</span>
           <MessageButton onClick={() => setIsNotifOpen(true)}>Показать новые</MessageButton>
+        </div>
+        <div className="stats-page__preview-item">
+          <span className="stats-page__preview-label">Self-test</span>
+          <MessageButton onClick={runSelfTest}>{t('test.run')}</MessageButton>
         </div>
       </div>
 

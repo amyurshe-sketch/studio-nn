@@ -87,22 +87,7 @@ function LeisurePage() {
         <h1 className="page-title">{t('leisure.title', { name: user?.name || '' })}</h1>
         <p className="page-description">{t('leisure.subtitle')}</p>
         
-        {/* Локальный переключатель тем для LeisurePage */}
-        <div className="leisure-theme-controls">
-          <button 
-            onClick={toggleLeisureTheme}
-            className="leisure-theme-toggle"
-            title={t('leisure.theme.change', { name: getThemeName() })}
-          >
-            {getThemeIcon()}
-          </button>
-          <span className="leisure-theme-label">
-            {t('leisure.theme.label')} <strong>{getThemeName()}</strong>
-          </span>
-          <span className="leisure-theme-info">
-            {t('leisure.theme.info')}
-          </span>
-        </div>
+        {/* Блок индикации/переключения темы скрыт по просьбе пользователя */}
       </header>
 
       <div className="leisure-content">
