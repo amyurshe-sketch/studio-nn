@@ -218,6 +218,31 @@
   font-size: 0.8rem;
 }
 
+/* ===== Mobile adjustments: single news block, no hover popovers ===== */
+@media (max-width: 768px) {
+  /* Only one column on mobile */
+  .leisure-page .news-columns-container { grid-template-columns: 1fr; }
+  .leisure-page .news-column-right { display: none; }
+
+  /* Disable hover summaries on mobile to avoid unexpected overlays */
+  .leisure-page .news-content-summary {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    transform: none !important;
+  }
+  .leisure-page .news-content-title:hover + .news-content-summary,
+  .leisure-page .news-content-title:focus-within + .news-content-summary,
+  .leisure-page .news-content-summary:hover {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    transform: none !important;
+  }
+}
+
 /* === СЕКЦИИ === */
 .leisure-page .fun-facts,
 .leisure-page .quick-actions,
