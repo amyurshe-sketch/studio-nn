@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
 import MessageButton from './components/MessageButton';
 import { useI18n } from './i18n';
 import { Link } from 'react-router-dom';
@@ -9,37 +9,27 @@ export default function RegisterPage() {
   const [name, setName] = useState('');
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
+  const [showPwd, setShowPwd] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [genPwd, setGenPwd] = useState(() => {
+    const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+    const len = 5 + Math.floor(Math.random() * 6); // 5..10
+    let s = '';
+    for (let i = 0; i < len; i++) s += chars[Math.floor(Math.random() * chars.length)];
+    return s;
+  });
 
-  const strength = useMemo(() => {
-    const pwd = password || '';
-    const uname = (name || '').trim().toLowerCase();
-    const p = pwd.trim();
-    if (!p) return { score: 0, label: 'Сила пароля: —', color: '#64748b', warn: null };
-    const lower = /[a-zа-я]/.test(p);
-    const upper = /[A-ZА-Я]/.test(p);
-    const digit = /\d/.test(p);
-    const symbol = /[^\w\s]/.test(p);
-    let score = 0;
-    if (p.length >= 5) score += 1;
-    if (p.length >= 8) score += 1;
-    if (p.length >= 12) score += 1;
-    const variety = [lower, upper, digit, symbol].filter(Boolean).length;
-    score += Math.max(0, variety - 1); // +0..3
-    let label = 'Слабый';
-    let color = '#ef4444';
-    if (score >= 4 && p.length >= 8) { label = 'Средний'; color = '#f59e0b'; }
-    if (score >= 6 && p.length >= 12) { label = 'Сильный'; color = '#10b981'; }
-    let warn: string | null = null;
-    if (uname && p.toLowerCase().includes(uname)) {
-      warn = 'Пароль содержит имя пользователя — это небезопасно';
-      // визуально понижаем оценку
-      label = 'Очень слабый';
-      color = '#ef4444';
-    }
-    return { score, label: `Сила пароля: ${label}`, color, warn };
-  }, [password, name]);
+  const regenerate = () => {
+    const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+    const len = 5 + Math.floor(Math.random() * 6); // 5..10
+    let s = '';
+    for (let i = 0; i < len; i++) s += chars[Math.floor(Math.random() * chars.length)];
+    setGenPwd(s);
+  };
+
+  
   return (
     <div style={{ padding: 24 }}>
       <Link to="/" style={{ display: 'inline-block', marginBottom: 16, color: 'var(--color-muted)' }}>← {t('back.home')}</Link>
@@ -109,43 +99,143 @@ export default function RegisterPage() {
           </label>
           <label style={{ display: 'grid', gap: 6 }}>
             <span style={{ color: 'var(--color-text)', fontWeight: 600 }}>Пароль:</span>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              minLength={5}
-              placeholder="Не менее 5 символов"
-              style={{
-                padding: '10px 12px',
-                borderRadius: 10,
-                border: '1px solid var(--color-border)',
-                background: 'var(--color-surface)',
-                color: 'var(--color-text)'
-              }}
-            />
-            <div style={{ fontSize: 12, color: strength.color, marginTop: 4 }}>{strength.label}</div>
-            {strength.warn && (
-              <div style={{ fontSize: 12, color: 'var(--color-danger)', marginTop: 2 }}>{strength.warn}</div>
-            )}
+            <div style={{ position: 'relative' }}>
+              <input
+                type={showPwd ? 'text' : 'password'}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                minLength={5}
+                placeholder="Не менее 5 символов"
+                style={{
+                  padding: '10px 38px 10px 12px',
+                  borderRadius: 10,
+                  border: '1px solid var(--color-border)',
+                  background: 'var(--color-surface)',
+                  color: 'var(--color-text)',
+                  width: '100%'
+                }}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPwd((v) => !v)}
+                aria-label={showPwd ? 'Скрыть пароль' : 'Показать пароль'}
+                title={showPwd ? 'Скрыть пароль' : 'Показать пароль'}
+                style={{
+                  position: 'absolute',
+                  right: 8,
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  background: 'transparent',
+                  border: 'none',
+                  color: 'var(--color-muted)',
+                  cursor: 'pointer',
+                  padding: 4,
+                  lineHeight: 1,
+                }}
+              >
+                {showPwd ? '🙈' : '👁️'}
+              </button>
+            </div>
+            
           </label>
           <label style={{ display: 'grid', gap: 6 }}>
             <span style={{ color: 'var(--color-text)', fontWeight: 600 }}>{t('register.password.confirm')}</span>
-            <input
-              type="password"
-              value={confirm}
-              onChange={(e) => setConfirm(e.target.value)}
-              required
-              minLength={5}
-              placeholder={t('register.password.confirm.placeholder')}
-              style={{
-                padding: '10px 12px',
-                borderRadius: 10,
-                border: '1px solid var(--color-border)',
-                background: 'var(--color-surface)',
-                color: 'var(--color-text)'
-              }}
-            />
+            <div style={{ position: 'relative' }}>
+              <input
+                type={showConfirm ? 'text' : 'password'}
+                value={confirm}
+                onChange={(e) => setConfirm(e.target.value)}
+                required
+                minLength={5}
+                placeholder={t('register.password.confirm.placeholder')}
+                style={{
+                  padding: '10px 38px 10px 12px',
+                  borderRadius: 10,
+                  border: '1px solid var(--color-border)',
+                  background: 'var(--color-surface)',
+                  color: 'var(--color-text)',
+                  width: '100%'
+                }}
+              />
+              <button
+                type="button"
+                onClick={() => setShowConfirm((v) => !v)}
+                aria-label={showConfirm ? 'Скрыть пароль' : 'Показать пароль'}
+                title={showConfirm ? 'Скрыть пароль' : 'Показать пароль'}
+                style={{
+                  position: 'absolute',
+                  right: 8,
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  background: 'transparent',
+                  border: 'none',
+                  color: 'var(--color-muted)',
+                  cursor: 'pointer',
+                  padding: 4,
+                  lineHeight: 1,
+                }}
+              >
+                {showConfirm ? '🙈' : '👁️'}
+              </button>
+            </div>
+          </label>
+          <label style={{ display: 'grid', gap: 6 }}>
+            <span style={{ color: 'var(--color-text)', fontWeight: 600 }}>Сгенерированный пароль:</span>
+            <div style={{ position: 'relative' }}>
+              <input
+                value={genPwd}
+                readOnly
+                style={{
+                  padding: '10px 86px 10px 12px',
+                  borderRadius: 10,
+                  border: '1px solid var(--color-border)',
+                  background: 'var(--color-surface)',
+                  color: 'var(--color-text)',
+                  width: '100%'
+                }}
+              />
+              <button
+                type="button"
+                onClick={() => { setPassword(genPwd); setConfirm(genPwd); }}
+                aria-label="Вставить пароль в поля"
+                title="Вставить пароль в поля"
+                style={{
+                  position: 'absolute',
+                  right: 40,
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  background: 'transparent',
+                  border: 'none',
+                  color: 'var(--color-muted)',
+                  cursor: 'pointer',
+                  padding: 4,
+                  lineHeight: 1,
+                }}
+              >
+                ⤵
+              </button>
+              <button
+                type="button"
+                onClick={regenerate}
+                aria-label="Сгенерировать ещё пароль"
+                title="Сгенерировать ещё"
+                style={{
+                  position: 'absolute',
+                  right: 8,
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  background: 'transparent',
+                  border: 'none',
+                  color: 'var(--color-muted)',
+                  cursor: 'pointer',
+                  padding: 4,
+                  lineHeight: 1,
+                }}
+              >
+                ↻
+              </button>
+            </div>
           </label>
           <div>
             <MessageButton type="submit" disabled={submitting}>

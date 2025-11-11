@@ -295,8 +295,37 @@ function ProfilePage() {
                     );
                   })}
                 </div>
-                <div style={{ marginTop: 8, display: 'flex', gap: 8, alignItems: 'center' }}>
-                  <button type="button" className="header-control-button" onClick={() => setFormAvatar('')}>Сбросить</button>
+                <div style={{ marginTop: 8, display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+                  {/* Desktop: keep Reset button */}
+                  <div className={styles.desktopOnly}>
+                    <button type="button" className="header-control-button" onClick={() => setFormAvatar('')}>Сбросить</button>
+                  </div>
+                  {/* Mobile: show Cancel/Save here instead of bottom */}
+                  <div className={styles.mobileOnly} style={{ display: 'flex', gap: 8 }}>
+                    <button
+                      type="button"
+                      className="header-control-button"
+                      onClick={() => { setEditMode(false); setSaveErr(null); }}
+                    >
+                      Отмена
+                    </button>
+                    <MessageButton
+                      onClick={() => {
+                        const local = {
+                          gender: (formGender || '').trim() || null,
+                          age: formAge ? Number(formAge) : null,
+                          about: (formAbout || '').trim() || null,
+                          avatar_url: (formAvatar || '').trim() || null,
+                        } as any;
+                        setProfileExtra(local);
+                        setSaveErr(null);
+                        setEditMode(false);
+                      }}
+                      disabled={saving}
+                    >
+                      Сохранить
+                    </MessageButton>
+                  </div>
                 </div>
               </div>
             ) : (
@@ -353,7 +382,7 @@ function ProfilePage() {
           {editMode && (
             <>
               {saveErr && <span style={{ color: '#ef4444' }}>{saveErr}</span>}
-              <div style={{ marginLeft: 'auto', display: 'flex', gap: 8 }}>
+              <div className={styles.desktopOnly} style={{ marginLeft: 'auto', display: 'flex', gap: 8 }}>
                 <button type="button" className="header-control-button" onClick={() => { setEditMode(false); setSaveErr(null); }}>
                   Отмена
                 </button>

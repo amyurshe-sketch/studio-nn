@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover" />
+  <title>Evil Glitch — Mobile</title>
+  <style>
+    html,body { height: 100%; }
+    body {
+      margin: 0; padding: 0; background: #000;
+      overscroll-behavior: none; -webkit-user-select: none; user-select: none;
+      touch-action: none;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+    }
+    /* Game canvases */
+    canvas { display: none; cursor: none; touch-action: none; }
+    #c { width: 100vw; height: 100vh; display: block; image-rendering: pixelated; image-rendering: crisp-edges; }
+    #g { position: absolute; left: -99999px; top: -99999px; }
+
+    /* HUD */
+    .hud { position: fixed; inset: 0; pointer-events: none; }
+    /* Left joystick */
+    .joy {
+      position: absolute; left: 16px; bottom: 18px; width: 120px; height: 120px; pointer-events: auto;
+      display: grid; place-items: center;
+    }
+    .joy-base {
+      width: 120px; height: 120px; border-radius: 50%;
+      background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.25);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.35) inset, 0 8px 18px rgba(0,0,0,0.35);
+    }
+    .joy-stick {
+      position: absolute; width: 62px; height: 62px; border-radius: 50%;
+      background: rgba(255,255,255,0.18); border: 1px solid rgba(255,255,255,0.35);
+      transform: translate(0,0); transition: transform 60ms linear;
+    }
+
+    /* Right fire button */
+    .btn-fire {
+      position: absolute; right: 16px; bottom: 22px; width: 74px; height: 74px; border-radius: 50%;
+      background: rgba(239,68,68,0.18); border: 1px solid rgba(239,68,68,0.5);
+      display: grid; place-items: center; pointer-events: auto; color: #fee2e2; font-weight: 800; font-size: 18px;
+      box-shadow: 0 8px 22px rgba(0,0,0,0.35);
+    }
+    .btn-fire:active { transform: scale(0.98); }
+
+    /* Rotate overlay for portrait */
+    .rotate { position: fixed; inset: 0; display: none; align-items: center; justify-content: center; background: rgba(0,0,0,.85); color: #fff; z-index: 10; }
+    .rotate .box { text-align: center; font: 600 16px/1.4 system-ui, -apple-system, Segoe UI, Roboto, sans-serif; padding: 16px 20px; border: 1px solid rgba(255,255,255,.2); border-radius: 12px; background: rgba(255,255,255,.06); }
+    @media (orientation: portrait) and (max-width: 1024px) { .rotate { display: flex; } }
+  </style>
+</head>
+<body>
+  <div id="d">
+    <canvas id="c"></canvas>
+    <canvas id="g" moz-opaque></canvas>
+  </div>
+
+  <!-- Mobile HUD: left joystick, right fire button -->
+  <div class="hud" id="hud">
+    <div class="joy" id="joy">
+      <div class="joy-base"></div>
+      <div class="joy-stick" id="joyStick"></div>
+    </div>
+    <button class="btn-fire" id="btnFire" aria-label="shoot">FIRE</button>
+  </div>
+
+  <div class="rotate"><div class="box">Поверните устройство в альбомную ориентацию</div></div>
+
+  <script>
+    // Utility: simulate keyboard events for the original game
+    const KEY_LEFT = 'ArrowLeft';
+    const KEY_RIGHT = 'ArrowRight';
+    const KEY_FIRE = ' '; // Space
+    function sendKey(key, type) {
+      const evt = new KeyboardEvent(type, { key, code: key === ' ' ? 'Space' : key, keyCode: key === ' ' ? 32 : undefined, bubbles: true, cancelable: true });
+      document.dispatchEvent(evt); window.dispatchEvent(evt);
+    }
+    function press(key) { sendKey(key, 'keydown'); }
+    function release(key) { sendKey(key, 'keyup'); }
+
+    // Prevent scroll/bounce on touch
+    document.addEventListener('touchmove', (e) => e.preventDefault(), { passive: false });
+
+    // Left joystick: maps to ArrowLeft/ArrowRight while held
+    (function() {
+      const joy = document.getElementById('joy');
+      const stick = document.getElementById('joyStick');
+      const R = 54; // movement radius inside base
+      const THRESH = 14; // deadzone threshold px
+      let active = false, pressedLeft = false, pressedRight = false;
+
+      function setPress(left, right) {
+        if (left && !pressedLeft) { press(KEY_LEFT); pressedLeft = true; }
+        if (!left && pressedLeft) { release(KEY_LEFT); pressedLeft = false; }
+        if (right && !pressedRight) { press(KEY_RIGHT); pressedRight = true; }
+        if (!right && pressedRight) { release(KEY_RIGHT); pressedRight = false; }
+      }
+      function centerStick() { stick.style.transform = 'translate(0px,0px)'; setPress(false,false); }
+      function handle(pos) {
+        const rect = joy.getBoundingClientRect();
+        const cx = rect.left + rect.width/2, cy = rect.top + rect.height/2;
+        const dx = pos.clientX - cx; const dy = pos.clientY - cy;
+        const dist = Math.hypot(dx, dy);
+        const clamped = dist > R ? R : dist;
+        const nx = dx * (clamped / (dist || 1));
+        const ny = dy * (clamped / (dist || 1));
+        stick.style.transform = `translate(${nx}px, ${ny}px)`;
+        if (Math.abs(nx) <= THRESH) { setPress(false,false); }
+        else if (nx < -THRESH) { setPress(true,false); }
+        else if (nx > THRESH) { setPress(false,true); }
+      }
+      const start = (e) => { active = true; handle(e.touches ? e.touches[0] : e); e.preventDefault(); };
+      const move = (e) => { if (!active) return; handle(e.touches ? e.touches[0] : e); e.preventDefault(); };
+      const end = (e) => { active = false; centerStick(); e.preventDefault(); };
+      joy.addEventListener('touchstart', start, { passive: false });
+      joy.addEventListener('touchmove', move, { passive: false });
+      joy.addEventListener('touchend', end, { passive: false });
+      joy.addEventListener('touchcancel', end, { passive: false });
+      joy.addEventListener('mousedown', start);
+      window.addEventListener('mousemove', move);
+      window.addEventListener('mouseup', end);
+    })();
+
+    // Right fire button: Space on press/release
+    (function() {
+      const btn = document.getElementById('btnFire');
+      const down = (e) => { press(KEY_FIRE); e.preventDefault(); };
+      const up = (e) => { release(KEY_FIRE); e.preventDefault(); };
+      btn.addEventListener('touchstart', down, { passive: false });
+      btn.addEventListener('touchend', up, { passive: false });
+      btn.addEventListener('touchcancel', up, { passive: false });
+      btn.addEventListener('mousedown', down);
+      btn.addEventListener('mouseup', up);
+      btn.addEventListener('mouseleave', up);
+    })();
+
+    // Try fullscreen at first interaction (some browsers require gesture)
+    let fsTried = false;
+    function tryFS() {
+      if (fsTried) return; fsTried = true;
+      const el = document.documentElement;
+      const req = el.requestFullscreen || el.webkitRequestFullscreen || el.mozRequestFullScreen || el.msRequestFullscreen;
+      if (req) { try { req.call(el); } catch(_) {} }
+    }
+    document.addEventListener('touchstart', tryFS, { once: true });
+
+    // Load original game bundle from sibling folder
+    const s = document.createElement('script');
+    s.async = true; s.src = '../devil-glitches/b.js';
+    document.body.appendChild(s);
+  </script>
+</body>
+</html>
+

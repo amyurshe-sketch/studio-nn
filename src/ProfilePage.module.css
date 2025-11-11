@@ -106,9 +106,15 @@
   background: var(--color-surface-alt);
 }
 
+/* Visibility helpers for responsive tweaks */
+.mobileOnly { display: none; }
+.desktopOnly { display: block; }
+
 @media (max-width: 768px) {
   .profilePage { padding: 48px 20px 80px; }
   .card { padding: 32px; }
+  .mobileOnly { display: block; }
+  .desktopOnly { display: none; }
 }
 
 /* dark theme adjustment for avatar plate */

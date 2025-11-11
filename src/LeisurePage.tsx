@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { useAuth } from './hooks/useAuth';
 import { useNews } from './hooks/useNews';
 import './leisure-styles.css';
@@ -15,6 +16,8 @@ function LeisurePage() {
   // Берем из БД; автообновление отключено — сервер освежает раз в сутки по первому запросу
   const { news: leftNews,  loading: leftLoading,  error: leftError }  = useNews(leftSource, 5, { auto: false });
   const { news: rightNews, loading: rightLoading, error: rightError } = useNews(rightSource, 5, { auto: false });
+  // Mobile-only: show one news column at a time, with toggle
+  const [mobileShown, setMobileShown] = useState<'left' | 'right'>('left');
   
   const [leisureTheme, setLeisureTheme] = useState('light');
   const [themeCycle] = useState(['light', 'dark', 'night']);
@@ -95,8 +98,19 @@ function LeisurePage() {
         <div className="news-columns-container">
           
           {/* Левая колонка - CNews */}
-          <div className="news-column news-column-left">
-            <h2 className="content-title">{t('leisure.col.left')}</h2>
+          <div className={"news-column news-column-left " + (mobileShown === 'left' ? 'mobile-visible' : 'mobile-hidden')}>
+            <h2 className="content-title">
+              {t('leisure.col.left')}
+              <button
+                type="button"
+                className="news-toggle-btn mobile-only"
+                title="Сменить блок новостей"
+                aria-label="Сменить блок новостей"
+                onClick={() => setMobileShown('right')}
+              >
+                ⇆
+              </button>
+            </h2>
             {leftLoading && <p className="news-loading">{t('leisure.loading.cnews')}</p>}
             {leftError && <p className="news-error">❌ {leftError}</p>}
             {!leftLoading && !leftError && leftNews.map((item) => (
@@ -119,8 +133,19 @@ function LeisurePage() {
           </div>
 
           {/* Правая колонка - Habr */}
-          <div className="news-column news-column-right">
-            <h2 className="content-title">{t('leisure.col.right')}</h2>
+          <div className={"news-column news-column-right " + (mobileShown === 'right' ? 'mobile-visible' : 'mobile-hidden')}>
+            <h2 className="content-title">
+              {t('leisure.col.right')}
+              <button
+                type="button"
+                className="news-toggle-btn mobile-only"
+                title="Сменить блок новостей"
+                aria-label="Сменить блок новостей"
+                onClick={() => setMobileShown('left')}
+              >
+                ⇆
+              </button>
+            </h2>
             {rightLoading && <p className="news-loading">{t('leisure.loading.habr')}</p>}
             {rightError && <p className="news-error">❌ {rightError}</p>}
             {!rightLoading && !rightError && rightNews.map((item) => (
@@ -177,14 +202,13 @@ function LeisurePage() {
                 <p>{t('leisure.actions.music.text')}</p>
               </div>
             </div>
-            <div className="action-card disabled">
+            <Link to="/mini-games" className="action-card" style={{ textDecoration: 'none' }}>
               <span className="action-emoji">🎮</span>
               <div>
                 <h4>{t('leisure.actions.games.title')}</h4>
                 <p>{t('leisure.actions.games.text')}</p>
               </div>
-              <span className="coming-badge">{t('leisure.actions.soon')}</span>
-            </div>
+            </Link>
             <div className="action-card disabled">
               <span className="action-emoji">🧘</span>
               <div>

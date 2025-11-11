@@ -127,6 +127,25 @@
   padding-bottom: 0.35rem;
 }
 
+/* Toggle button near news titles (shown on mobile) */
+.leisure-page .news-toggle-btn {
+  appearance: none;
+  background: transparent;
+  border: 1px solid var(--leisure-border);
+  color: var(--leisure-text);
+  border-radius: 8px;
+  padding: 2px 8px;
+  font-size: 0.95rem;
+  line-height: 1.2;
+  cursor: pointer;
+}
+.leisure-page .news-toggle-btn:hover { background: var(--leisure-surface-2); }
+
+/* Visibility helpers for responsive behavior */
+.mobile-only { display: none; }
+.mobile-visible {}
+.mobile-hidden {}
+
 /* === ЭЛЕМЕНТЫ НОВОСТЕЙ === */
 .leisure-page .news-content-item {
   margin: 0;
@@ -218,11 +237,21 @@
   font-size: 0.8rem;
 }
 
-/* ===== Mobile adjustments: single news block, no hover popovers ===== */
+/* ===== Mobile adjustments: single news block with toggle, no hover popovers ===== */
 @media (max-width: 768px) {
   /* Only one column on mobile */
   .leisure-page .news-columns-container { grid-template-columns: 1fr; }
-  .leisure-page .news-column-right { display: none; }
+  /* Use helper classes to control which column shows */
+  .mobile-hidden { display: none !important; }
+  .mobile-visible { display: block !important; }
+  .mobile-only { display: inline-flex; }
+  /* Place title and toggle inline */
+  .leisure-page .content-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: .5rem;
+  }
 
   /* Disable hover summaries on mobile to avoid unexpected overlays */
   .leisure-page .news-content-summary {

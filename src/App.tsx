@@ -4,6 +4,7 @@ import './App.css';
 import UsersPage from './UsersPage';
 import ProfilePage from './ProfilePage';
 import LeisurePage from './LeisurePage';
+import MiniGamesPage from './MiniGamesPage';
 // Removed password/username auth pages
 import MessageButton from './components/MessageButton';
 // Telegram auth removed
@@ -77,6 +78,9 @@ function AppShell() {
     document.documentElement.classList.toggle('dark', theme === 'dark');
   }, [theme]);
 
+  // Show global chrome (header/nav) on all pages, including mini-games
+  const hideGlobalChrome = false;
+
   return (
     <div className={`App ${isAuthenticated ? 'App--auth' : ''}`}>
         {/* Protective banner if backend is not configured */}
@@ -94,6 +98,7 @@ function AppShell() {
             Backend is not configured. Set VITE_API_BASE_URL and VITE_WS_URL in your deployment.
           </div>
         )}
+        {!hideGlobalChrome && (
         <header className="main-header">
           <div className="header-content">
             <div className="header-left">
@@ -198,6 +203,7 @@ function AppShell() {
             </div>
           </div>
         </header>
+        )}
 
         <main className="main-content">
           <div key={location.pathname} className="page-transition">
@@ -232,6 +238,14 @@ function AppShell() {
                 }
               />
               <Route
+                path="/mini-games"
+                element={
+                  <ProtectedRoute>
+                    <MiniGamesPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
                 path="/stats"
                 element={
                   <ProtectedRoute>
@@ -243,16 +257,18 @@ function AppShell() {
           </div>
         </main>
 
-        {/* Messaging/notifications UI removed */}
-        <NotificationsModal
-          open={isNotifOpen}
-          onClose={() => setIsNotifOpen(false)}
-          items={notifItems}
-          onAck={ackNotif}
-        />
+        {/* Messaging/notifications UI removed; also hidden on mini-games page */}
+        {!hideGlobalChrome && (
+          <NotificationsModal
+            open={isNotifOpen}
+            onClose={() => setIsNotifOpen(false)}
+            items={notifItems}
+            onAck={ackNotif}
+          />
+        )}
 
         {/* Mobile drawer navigation */}
-        {isAuthenticated && mobileNavOpen && (
+        {isAuthenticated && !hideGlobalChrome && mobileNavOpen && (
           <>
             <div className="mobile-overlay" onClick={() => setMobileNavOpen(false)} />
             <nav className="mobile-drawer" role="dialog" aria-modal="true">
