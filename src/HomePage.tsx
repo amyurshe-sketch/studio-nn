@@ -169,7 +169,7 @@ function HomePage() {
               <MessageButton className="hero-primary-cta" onClick={() => navigate('/register')}>
                 {t('auth.register')}
               </MessageButton>
-              <ButtonText as={Link} to="/login">вход</ButtonText>
+              <ButtonText as={Link} to="/login">{t('auth.login')}</ButtonText>
             </div>
           </div>
 
@@ -220,7 +220,7 @@ function HomePage() {
             <MessageButton className="invite-cta" onClick={() => navigate('/register')}>
               {t('auth.register')}
             </MessageButton>
-            <ButtonText as={Link} to="/login">вход</ButtonText>
+            <ButtonText as={Link} to="/login">{t('auth.login')}</ButtonText>
           </div>
         </div>
       </section>

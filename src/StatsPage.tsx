@@ -47,6 +47,7 @@ function StatsPage() {
     }
   }, [t, language]);
 
+
   return (
     <div className="stats-page">
       <div className="stats-page__media">

@@ -11,11 +11,12 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
   return (
     <div style={{ padding: 24 }}>
       <Link to="/" style={{ display: 'inline-block', marginBottom: 16, color: 'var(--color-muted)' }}>← {t('back.home')}</Link>
-      <h2 style={{ margin: 0, color: 'var(--color-text)' }}>Вход</h2>
-      <p style={{ marginTop: 8, color: 'var(--color-muted)' }}>Введите имя пользователя и пароль.</p>
+      <h2 style={{ margin: 0, color: 'var(--color-text)' }}>{t('login.title')}</h2>
+      <p style={{ marginTop: 8, color: 'var(--color-muted)' }}>{t('login.description')}</p>
       <form
         onSubmit={async (e) => {
           e.preventDefault();
@@ -54,12 +55,12 @@ export default function LoginPage() {
         {error && <div style={{ color: 'var(--color-danger)', marginBottom: 12 }}>{error}</div>}
         <div style={{ display: 'grid', gap: 12 }}>
           <label style={{ display: 'grid', gap: 6 }}>
-            <span style={{ color: 'var(--color-text)', fontWeight: 600 }}>Имя пользователя:</span>
+            <span style={{ color: 'var(--color-text)', fontWeight: 600 }}>{t('login.username')}</span>
             <input
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
-              placeholder="Введите имя"
+              placeholder={t('login.username.placeholder')}
               style={{
                 padding: '10px 12px',
                 borderRadius: 10,
@@ -70,25 +71,48 @@ export default function LoginPage() {
             />
           </label>
           <label style={{ display: 'grid', gap: 6 }}>
-            <span style={{ color: 'var(--color-text)', fontWeight: 600 }}>Пароль:</span>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              placeholder="Введите пароль"
-              style={{
-                padding: '10px 12px',
-                borderRadius: 10,
-                border: '1px solid var(--color-border)',
-                background: 'var(--color-surface)',
-                color: 'var(--color-text)'
-              }}
-            />
+            <span style={{ color: 'var(--color-text)', fontWeight: 600 }}>{t('login.password')}</span>
+            <div style={{ position: 'relative' }}>
+              <input
+                type={showPassword ? 'text' : 'password'}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                placeholder={t('login.password.placeholder')}
+                style={{
+                  padding: '10px 38px 10px 12px',
+                  borderRadius: 10,
+                  border: '1px solid var(--color-border)',
+                  background: 'var(--color-surface)',
+                  color: 'var(--color-text)',
+                  width: '100%'
+                }}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword((value) => !value)}
+                aria-label={showPassword ? t('login.password.toggle.hide') : t('login.password.toggle.show')}
+                title={showPassword ? t('login.password.toggle.hide') : t('login.password.toggle.show')}
+                style={{
+                  position: 'absolute',
+                  right: 8,
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  background: 'transparent',
+                  border: 'none',
+                  color: 'var(--color-muted)',
+                  cursor: 'pointer',
+                  padding: 4,
+                  lineHeight: 1,
+                }}
+              >
+                {showPassword ? '🙈' : '👁️'}
+              </button>
+            </div>
           </label>
           <div>
             <MessageButton type="submit" disabled={submitting}>
-              {submitting ? 'Вход...' : 'Войти'}
+              {submitting ? t('login.submitting') : t('login.submit')}
             </MessageButton>
           </div>
         </div>

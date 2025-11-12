@@ -136,7 +136,7 @@ function AppShell() {
               {!isAuthenticated ? (
                 <>
                   <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-                    <ButtonText as={Link} to="/login">вход</ButtonText>
+                    <ButtonText as={Link} to="/login">{t('auth.login')}</ButtonText>
                     <MessageButton
                       className="register-button"
                       onClick={() => navigate('/register')}
