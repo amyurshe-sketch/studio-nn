@@ -61,7 +61,8 @@ export default function RegisterPage() {
               throw new Error(msg);
             }
             // Куки сессии выставлены сервером, перезагрузим/навигация
-            location.assign('/users');
+            window.location.href = '/users';
+            return;
           } catch (err: any) {
             setError(err?.message || 'Ошибка регистрации');
           } finally {

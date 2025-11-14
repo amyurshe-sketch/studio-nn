@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useI18n } from './i18n';
 import MessageButton from './components/MessageButton';
 import { API_BASE_URL } from './lib/env';
 
 export default function LoginPage() {
   const { t } = useI18n();
-  const navigate = useNavigate();
   const [name, setName] = useState('');
   const [password, setPassword] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -34,8 +33,8 @@ export default function LoginPage() {
               throw new Error(msg);
             }
             // Сессия установлена в HttpOnly cookies. Обновим страницу/перейдём для подхвата контекста.
-            navigate('/users');
-            try { window.location.reload(); } catch {}
+            window.location.href = '/users';
+            return;
           } catch (err: any) {
             setError(err?.message || 'Ошибка входа');
           } finally {
