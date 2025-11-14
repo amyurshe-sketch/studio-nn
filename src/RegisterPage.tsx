@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
 import MessageButton from './components/MessageButton';
 import { useI18n } from './i18n';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { API_BASE_URL } from './lib/env';
+import { useAuth } from './hooks/useAuth';
 
 export default function RegisterPage() {
   const { t } = useI18n();
+  const { refreshUser } = useAuth();
+  const navigate = useNavigate();
   const [name, setName] = useState('');
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
@@ -60,7 +63,11 @@ export default function RegisterPage() {
               } catch {}
               throw new Error(msg);
             }
-            // Куки сессии выставлены сервером, перезагрузим/навигация
+            const refreshed = await refreshUser();
+            if (refreshed) {
+              navigate('/users', { replace: true });
+              return;
+            }
             window.location.href = '/users';
             return;
           } catch (err: any) {

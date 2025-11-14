@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useI18n } from './i18n';
 import MessageButton from './components/MessageButton';
 import { API_BASE_URL } from './lib/env';
+import { useAuth } from './hooks/useAuth';
 
 export default function LoginPage() {
   const { t } = useI18n();
+  const { refreshUser } = useAuth();
+  const navigate = useNavigate();
   const [name, setName] = useState('');
   const [password, setPassword] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -32,10 +35,14 @@ export default function LoginPage() {
               const msg = resp.status === 401 ? 'Неверные учетные данные' : `Ошибка: ${resp.status}`;
               throw new Error(msg);
             }
-            // Сессия установлена в HttpOnly cookies. Обновим страницу/перейдём для подхвата контекста.
+            const refreshed = await refreshUser();
+            if (refreshed) {
+              navigate('/users', { replace: true });
+              return;
+            }
             window.location.href = '/users';
             return;
-          } catch (err: any) {
+         } catch (err: any) {
             setError(err?.message || 'Ошибка входа');
           } finally {
             setSubmitting(false);

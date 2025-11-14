@@ -12,6 +12,7 @@ type AuthContextValue = {
   getAuthHeaders: () => Record<string, string>; // returns {} in cookie mode
   refreshAccessToken: () => Promise<any>; // noop in cookie mode
   isAuthenticated: boolean;
+  refreshUser: () => Promise<boolean>;
 };
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -89,52 +90,50 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  useEffect(() => {
-    // If API is not configured (e.g., Vercel preview without backend), skip network
+  const refreshUser = useCallback(async () => {
     if (API_UNCONFIGURED) {
       setUser(null);
-      setInitializing(false);
-      return;
+      return false;
     }
-    // Restore via HttpOnly cookie /me
+    try {
+      let resp = await fetch(`${API_BASE_URL}/me`, { credentials: 'include' });
+      if (resp.status === 401) {
+        try {
+          const r = await fetch(`${API_BASE_URL}/refresh-token`, { method: 'POST', credentials: 'include' });
+          if (r.ok) {
+            resp = await fetch(`${API_BASE_URL}/me`, { credentials: 'include' });
+          }
+        } catch {}
+      }
+      if (resp.ok) {
+        const data = await resp.json();
+        if (data && (data.user_id || data.id)) {
+          setUser({
+            user_id: data.user_id ?? data.id,
+            name: data.name ?? data.username ?? 'user',
+            role: data.role ?? 'user',
+          });
+          try { wsClient.setAutoReconnect(true); } catch {}
+          wsClient.connect().catch(() => {});
+          return true;
+        }
+      }
+      setUser(null);
+      return false;
+    } catch {
+      setUser(null);
+      return false;
+    }
+  }, []);
+
+  useEffect(() => {
     let cancelled = false;
     (async () => {
-      try {
-        let resp = await fetch(`${API_BASE_URL}/me`, { credentials: 'include' });
-        if (cancelled) return;
-        if (resp.status === 401) {
-          // Try to refresh session via refresh cookie
-          try {
-            const r = await fetch(`${API_BASE_URL}/refresh-token`, { method: 'POST', credentials: 'include' });
-            if (r.ok) {
-              resp = await fetch(`${API_BASE_URL}/me`, { credentials: 'include' });
-            }
-          } catch {}
-        }
-        if (resp.ok) {
-          const data = await resp.json();
-          if (data && (data.user_id || data.id)) {
-            setUser({
-              user_id: data.user_id ?? data.id,
-              name: data.name ?? data.username ?? 'user',
-              role: data.role ?? 'user',
-            });
-            try { wsClient.setAutoReconnect(true); } catch {}
-            wsClient.connect().catch(() => {});
-          } else {
-            setUser(null);
-          }
-        } else {
-          setUser(null);
-        }
-      } catch {
-        setUser(null);
-      } finally {
-        if (!cancelled) setInitializing(false);
-      }
+      await refreshUser();
+      if (!cancelled) setInitializing(false);
     })();
     return () => { cancelled = true; };
-  }, []);
+  }, [refreshUser]);
 
   // No token scheduling in cookie mode
 
@@ -172,6 +171,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       getAuthHeaders,
       refreshAccessToken,
       isAuthenticated: !!user,
+      refreshUser,
     }}>
       {children}
     </AuthContext.Provider>
