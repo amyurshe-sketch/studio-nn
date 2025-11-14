@@ -1082,72 +1082,6 @@ button {
   letter-spacing: 0.02em;
 }
 
-.stats-page {
-  min-height: 100vh;
-  background: var(--color-page);
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: clamp(24px, 6vw, 60px);
-  align-items: center;
-  justify-content: center;
-  padding: clamp(32px, 8vw, 72px);
-}
-
-.stats-page__media {
-  display: flex;
-  justify-content: center;
-}
-
-.stats-page__preview-grid {
-  position: relative;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: clamp(16px, 4vw, 32px);
-}
-
-.stats-page__preview-item {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 10px;
-  padding: clamp(18px, 3vw, 26px);
-  border-radius: 16px;
-  background: rgba(255, 255, 255, 0.9);
-  border: 1px solid rgba(148, 163, 184, 0.3);
-  box-shadow: 0 14px 32px rgba(15, 23, 42, 0.1);
-  color: var(--color-text);
-}
-
-[data-theme='dark'] .stats-page__preview-item {
-  background: rgba(15, 23, 42, 0.88);
-  border-color: rgba(148, 163, 184, 0.3);
-  box-shadow: 0 18px 36px rgba(2, 6, 23, 0.4);
-}
-
-.stats-page__preview-label {
-  font-size: 0.9rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: rgba(71, 85, 105, 0.75);
-}
-
-[data-theme='dark'] .stats-page__preview-label {
-  color: rgba(203, 213, 225, 0.75);
-}
-
-.stats-page__preview-button {
-  font-size: 1.05rem;
-}
-
-.stats-page__image {
-  display: block;
-  width: min(420px, 100%);
-  height: auto;
-  border-radius: 18px;
-  box-shadow: 0 26px 48px rgba(2, 6, 23, 0.4);
-  border: 1px solid rgba(148, 163, 184, 0.35);
-  object-fit: cover;
-}
 
 .loading-spinner {
   font-size: 0.95rem;
@@ -2060,7 +1994,6 @@ button {
 
 /* Индекс строки пользователя и подписи */
 [data-theme='dark'] .user-row__index,
-[data-theme='dark'] .stats-page__preview-label,
 [data-theme='dark'] .last-update {
   color: rgba(148, 163, 184, 0.75);
 }
