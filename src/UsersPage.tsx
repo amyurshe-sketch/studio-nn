@@ -372,29 +372,6 @@ function UsersPage() {
           </div>
         </div>
 
-        {/* Кнопка теста под фильтрами */}
-        <div style={{ marginBottom: 16 }}>
-          <MessageButton
-            onClick={async () => {
-              try {
-                const res = await fetch(`${API_BASE_URL}/self-test`, { credentials: 'include' });
-                const j = await res.json();
-                alert(
-                  `${t('test.run')}:\n` +
-                  `API: ${j.api_ok ? 'OK' : 'FAIL'}\n` +
-                  `DB: ${j.db_ok ? 'OK' : 'FAIL'}\n` +
-                  `Redis: ${j.redis_ok === null ? 'N/A' : (j.redis_ok ? 'OK' : 'FAIL')}\n` +
-                  `${t('notifications.title')}: ${j.authenticated ? 'YES' : 'NO'}`
-                );
-              } catch (e) {
-                alert('Self-test failed to run');
-              }
-            }}
-          >
-            {t('test.run')}
-          </MessageButton>
-        </div>
-
         <div key={`${showOnlineOnly}-${genderFilter}-${filteredUsers.length}`} className="users-list" data-animate={(!loading && filteredUsers.length > 0) ? 'true' : 'false'}>
           {displayedUsers.length === 0 ? (
             <div className="no-users">{t('users.empty')}</div>
