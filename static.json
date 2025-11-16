@@ -1,9 +1,12 @@
 {
   "routes": [
     {
-      "src": "/[^.]*",
-      "dest": "/index.html",
-      "status": 200
+      "src": "/assets/(.*)",
+      "dest": "/assets/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
     }
   ]
 }
