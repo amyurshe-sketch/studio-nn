@@ -99,7 +99,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       let resp = await fetch(`${API_BASE_URL}/me`, { credentials: 'include' });
       if (resp.status === 401) {
         try {
-          const r = await fetch(`${API_BASE_URL}/refresh-token`, { method: 'POST', credentials: 'include' });
+          const headers: any = {};
+          const csrf = getCsrfToken();
+          if (csrf) headers['X-CSRF-Token'] = csrf;
+          const r = await fetch(`${API_BASE_URL}/refresh-token`, {
+            method: 'POST',
+            credentials: 'include',
+            headers,
+          });
           if (r.ok) {
             resp = await fetch(`${API_BASE_URL}/me`, { credentials: 'include' });
           }
