@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useI18n } from './i18n';
 import { API_BASE_URL } from './lib/env';
 import './AiChatPage.css';
@@ -11,14 +11,16 @@ type ChatMessage = {
 const AiChatPage = () => {
   const { t } = useI18n();
   const [message, setMessage] = useState('');
-  const [history, setHistory] = useState<ChatMessage[]>([]);
-  const [answer, setAnswer] = useState('');
+  const [history, setHistory] = useState<ChatMessage[]>([
+    { role: 'assistant', content: 'Привет, чем могу помочь?' },
+  ]);
   const [chatId, setChatId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const messagesRef = useRef<HTMLDivElement | null>(null);
 
   const handleSend = useCallback(async () => {
-    if (!message.trim()) return;
+    if (loading || !message.trim()) return;
     setLoading(true);
     setError(null);
     try {
@@ -43,7 +45,6 @@ const AiChatPage = () => {
       if (!resp.ok) {
         throw new Error(data?.detail || 'Не удалось получить ответ от ИИ');
       }
-      setAnswer(data.answer || '');
       setChatId(data.chat_id || null);
       setHistory((prev) => [
         ...prev,
@@ -58,16 +59,40 @@ const AiChatPage = () => {
     }
   }, [message, history, chatId]);
 
+  useEffect(() => {
+    if (!messagesRef.current) return;
+    messagesRef.current.scrollTo({
+      top: messagesRef.current.scrollHeight,
+      behavior: 'smooth',
+    });
+  }, [history]);
+
   return (
     <div className="ai-chat">
       <div className="ai-chat__card">
-        <p className="ai-chat__eyebrow">{t('ai.eyebrow')}</p>
-        <h1 className="ai-chat__title">{t('ai.title')}</h1>
-        <p className="ai-chat__subtitle">
-          {t('ai.subtitle')}
-        </p>
+        <div className="ai-chat__dialog">
+          <div className="ai-chat__answer-label">Чат с ИИ</div>
+          <div className="ai-chat__messages" role="log" aria-live="polite">
+            <div ref={messagesRef} className="ai-chat__messages-scroll">
+              {history.length === 0 ? (
+                <div className="ai-chat__placeholder">
+                  <span>Напишите вопрос, чтобы начать диалог</span>
+                </div>
+              ) : (
+                history.map((msg, idx) => (
+                  <div key={idx} className={`ai-chat__bubble ai-chat__bubble--${msg.role}`}>
+                    <div className="ai-chat__bubble-meta">
+                      {msg.role === 'user' ? 'Вы' : 'Ассистент'}
+                    </div>
+                    <div className="ai-chat__bubble-text">{msg.content}</div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
 
-        <div className="ai-chat__prompt">
+        <div className="ai-chat__prompt ai-chat__prompt--below">
           <label className="ai-chat__label" htmlFor="ai-message">
             Текст запроса
           </label>
@@ -77,6 +102,13 @@ const AiChatPage = () => {
             onChange={(e) => setMessage(e.target.value)}
             placeholder="Спросите что угодно…"
             rows={3}
+            maxLength={100}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                handleSend();
+              }
+            }}
           />
           <div className="ai-chat__actions">
             <button
@@ -91,19 +123,6 @@ const AiChatPage = () => {
             {loading && <span className="ai-chat__status">Отправка…</span>}
             {error && <span className="ai-chat__status ai-chat__status--error">{error}</span>}
           </div>
-        </div>
-
-        {answer && (
-          <div className="ai-chat__answer">
-            <div className="ai-chat__answer-label">Ответ</div>
-            <p>{answer}</p>
-          </div>
-        )}
-
-        <div className="ai-chat__meta">
-          <span>{t('ai.meta.availability')}</span>
-          <span className="ai-chat__dot" />
-          <span>{t('ai.meta.updated')}</span>
         </div>
       </div>
     </div>
