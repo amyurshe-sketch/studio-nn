@@ -17,9 +17,11 @@ import HomePage from './HomePage';
 import StatsPage from './StatsPage';
 import RegisterPage from './RegisterPage';
 import LoginPage from './LoginPage';
+import AiChatPage from './AiChatPage';
 // Telegram callback removed
 import { useI18n } from './i18n';
 import { API_UNCONFIGURED, API_BASE_URL } from './lib/env';
+import StudioLogo from './components/StudioLogo';
 
 function ProtectedRoute({ children }) {
   const { isAuthenticated, initializing } = useAuth();
@@ -102,12 +104,13 @@ function AppShell() {
         <header className="main-header">
           <div className="header-content">
             <div className="header-left">
-              <h1 className="logo">{t('app.logo')}</h1>
+              <StudioLogo as="h1" className="logo" />
               {isAuthenticated && (
                 <nav className="main-nav">
                   <ButtonText as={Link} to="/users">{t('nav.users')}</ButtonText>
                   <ButtonText as={Link} to="/profile">{t('nav.profile')}</ButtonText>
                   <ButtonText as={Link} to="/leisure">{t('nav.leisure')}</ButtonText>
+                  <ButtonText as={Link} to="/ai-chat">{t('nav.aiChat')}</ButtonText>
                 </nav>
               )}
             </div>
@@ -253,6 +256,14 @@ function AppShell() {
                   </ProtectedRoute>
                 }
               />
+              <Route
+                path="/ai-chat"
+                element={
+                  <ProtectedRoute>
+                    <AiChatPage />
+                  </ProtectedRoute>
+                }
+              />
             </Routes>
           </div>
         </main>
@@ -273,13 +284,14 @@ function AppShell() {
             <div className="mobile-overlay" onClick={() => setMobileNavOpen(false)} />
             <nav className="mobile-drawer" role="dialog" aria-modal="true">
               <div className="mobile-drawer__header">
-                <span className="mobile-drawer__title">{t('app.logo')}</span>
+                <StudioLogo as="span" className="logo mobile-drawer__title" />
                 <button className="mobile-drawer__close" onClick={() => setMobileNavOpen(false)} aria-label="Close menu">×</button>
               </div>
               <div className="mobile-drawer__links">
                 <Link to="/users" className="mobile-nav-link" onClick={() => setMobileNavOpen(false)}>{t('nav.users')}</Link>
                 <Link to="/profile" className="mobile-nav-link" onClick={() => setMobileNavOpen(false)}>{t('nav.profile')}</Link>
                 <Link to="/leisure" className="mobile-nav-link" onClick={() => setMobileNavOpen(false)}>{t('nav.leisure')}</Link>
+                <Link to="/ai-chat" className="mobile-nav-link" onClick={() => setMobileNavOpen(false)}>{t('nav.aiChat')}</Link>
               </div>
               <div className="mobile-drawer__footer">
                 <button className="mobile-nav-link mobile-nav-link--danger" onClick={() => { setMobileNavOpen(false); logout(); }}>

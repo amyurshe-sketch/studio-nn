@@ -34,10 +34,19 @@ export default function RegisterPage() {
 
   
   return (
-    <div style={{ padding: 24 }}>
-      <Link to="/" style={{ display: 'inline-block', marginBottom: 16, color: 'var(--color-muted)' }}>← {t('back.home')}</Link>
-      <h2 style={{ margin: 0, color: 'var(--color-text)' }}>{t('register.title')}</h2>
-      <p style={{ marginTop: 8, color: 'var(--color-muted)' }}>{t('register.subtitle')}</p>
+    <div
+      style={{
+        minHeight: 'calc(100vh - 120px)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '32px 16px',
+      }}
+    >
+      <div style={{ width: '100%', maxWidth: 560 }}>
+        <Link to="/" style={{ display: 'inline-block', marginBottom: 16, color: 'var(--color-muted)' }}>← {t('back.home')}</Link>
+        <h2 style={{ margin: 0, color: 'var(--color-text)' }}>{t('register.title')}</h2>
+        <p style={{ marginTop: 8, color: 'var(--color-muted)' }}>{t('register.subtitle')}</p>
 
       <form
         onSubmit={async (e) => {
@@ -252,6 +261,7 @@ export default function RegisterPage() {
           </div>
         </div>
       </form>
+      </div>
     </div>
   );
 }

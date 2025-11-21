@@ -11,6 +11,7 @@ const resources: Resources = {
     'nav.users': 'Пользователи',
     'nav.profile': 'Профиль',
     'nav.leisure': 'Досуг',
+    'nav.aiChat': 'Чат ИИ',
     'auth.register': 'начать',
     'auth.login': 'Войти',
     
@@ -184,12 +185,22 @@ const resources: Resources = {
     'users.loading': 'Обновляем список…',
     'users.footer.prefix': 'На странице онлайн:',
     'users.footer.of': 'из'
+    ,
+    // AI chat
+    'ai.eyebrow': 'Экспериментально',
+    'ai.title': 'Чат с ИИ',
+    'ai.subtitle': 'Быстрые подсказки, идеи и ответы. Интерфейс упрощён, чтобы вы могли сосредоточиться на диалоге.',
+    'ai.cta.line1': 'Чат',
+    'ai.cta.line2': 'ИИ',
+    'ai.meta.availability': 'Доступно 24/7',
+    'ai.meta.updated': 'Обновлено: сегодня'
   },
   en: {
     'app.logo': 'Studio NN',
     'nav.users': 'Users',
     'nav.profile': 'Profile',
     'nav.leisure': 'Leisure',
+    'nav.aiChat': 'AI Chat',
     'auth.register': 'Register',
     'auth.login': 'Log in',
     
@@ -363,6 +374,15 @@ const resources: Resources = {
     'users.loading': 'Refreshing list…',
     'users.footer.prefix': 'Online on page:',
     'users.footer.of': 'of'
+    ,
+    // AI chat
+    'ai.eyebrow': 'Experimental',
+    'ai.title': 'AI Chat',
+    'ai.subtitle': 'Fast prompts, ideas, and answers. A minimal interface so you can focus on the conversation.',
+    'ai.cta.line1': 'AI',
+    'ai.cta.line2': 'Chat',
+    'ai.meta.availability': 'Available 24/7',
+    'ai.meta.updated': 'Updated: today'
   },
 };
 

@@ -55,6 +55,11 @@
   font-size: 1.05rem;
 }
 
+.stats-page__preview-logo {
+  display: inline-block;
+  font-size: 1.8rem;
+}
+
 .stats-page__image {
   display: block;
   width: min(420px, 100%);

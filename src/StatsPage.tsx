@@ -9,6 +9,7 @@ import { useNotifications } from './hooks/useNotifications';
 import ThreadModal from './components/ThreadModal';
 import { API_BASE_URL } from './lib/env';
 import { useI18n } from './i18n';
+import StudioLogo from './components/StudioLogo';
 import './StatsPage.css';
 
 
@@ -125,6 +126,10 @@ function StatsPage() {
         <div className="stats-page__preview-item">
           <span className="stats-page__preview-label">Self-test</span>
           <MessageButton onClick={runSelfTest}>{t('test.run')}</MessageButton>
+        </div>
+        <div className="stats-page__preview-item">
+          <span className="stats-page__preview-label">StudioLogo</span>
+          <StudioLogo className="stats-page__preview-logo" />
         </div>
       </div>
       <section className="stats-page__form-wrapper">
