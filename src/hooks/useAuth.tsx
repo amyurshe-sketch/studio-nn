@@ -3,6 +3,29 @@ import { wsClient } from '../lib/wsClient';
 import { API_BASE_URL, API_UNCONFIGURED } from '../lib/env';
 
 type User = { user_id: number; name: string; role: string } | null;
+const USER_CACHE_KEY = 'auth_cached_user';
+
+const readCachedUser = (): User => {
+  try {
+    if (typeof window === 'undefined' || !window.localStorage) return null;
+    const raw = localStorage.getItem(USER_CACHE_KEY);
+    if (!raw) return null;
+    return JSON.parse(raw);
+  } catch {
+    return null;
+  }
+};
+
+const writeCachedUser = (user: User) => {
+  try {
+    if (typeof window === 'undefined' || !window.localStorage) return;
+    if (user) {
+      localStorage.setItem(USER_CACHE_KEY, JSON.stringify(user));
+    } else {
+      localStorage.removeItem(USER_CACHE_KEY);
+    }
+  } catch {}
+};
 type AuthContextValue = {
   token: string | null; // always null with cookie-based auth; kept for backward compat
   user: User;
@@ -38,7 +61,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // token/refresh no longer used; kept for API compatibility
   const [token] = useState<string | null>(null);
   const [refreshToken] = useState<string | null>(null);
-  const [user, setUser] = useState<User>(null);
+  const [user, setUser] = useState<User>(() => {
+    try {
+      return readCachedUser();
+    } catch {
+      return null;
+    }
+  });
   const [loading, setLoading] = useState(false);
   const [initializing, setInitializing] = useState(true);
 
@@ -69,6 +98,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const clearSession = useCallback(() => {
     setUser(null);
+    writeCachedUser(null);
     setInitializing(false);
     try {
       wsClient.setAutoReconnect(false);
@@ -120,15 +150,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             name: data.name ?? data.username ?? 'user',
             role: data.role ?? 'user',
           });
+          writeCachedUser({
+            user_id: data.user_id ?? data.id,
+            name: data.name ?? data.username ?? 'user',
+            role: data.role ?? 'user',
+          });
           try { wsClient.setAutoReconnect(true); } catch {}
           wsClient.connect().catch(() => {});
           return true;
         }
       }
-      setUser(null);
+      if (resp.status === 401) {
+        setUser(null);
+        writeCachedUser(null);
+      }
       return false;
     } catch {
-      setUser(null);
+      // Keep cached user on network errors so UI не пропадает при недоступном API
       return false;
     }
   }, []);
