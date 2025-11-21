@@ -68,6 +68,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return null;
     }
   });
+  const [allowOffline, setAllowOffline] = useState<boolean>(() => !!readCachedUser());
   const [loading, setLoading] = useState(false);
   const [initializing, setInitializing] = useState(true);
 
@@ -99,6 +100,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const clearSession = useCallback(() => {
     setUser(null);
     writeCachedUser(null);
+    setAllowOffline(false);
     setInitializing(false);
     try {
       wsClient.setAutoReconnect(false);
@@ -145,16 +147,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (resp.ok) {
         const data = await resp.json();
         if (data && (data.user_id || data.id)) {
-          setUser({
+          const nextUser = {
             user_id: data.user_id ?? data.id,
             name: data.name ?? data.username ?? 'user',
             role: data.role ?? 'user',
-          });
-          writeCachedUser({
-            user_id: data.user_id ?? data.id,
-            name: data.name ?? data.username ?? 'user',
-            role: data.role ?? 'user',
-          });
+          };
+          setUser(nextUser);
+          writeCachedUser(nextUser);
+          setAllowOffline(true);
           try { wsClient.setAutoReconnect(true); } catch {}
           wsClient.connect().catch(() => {});
           return true;
@@ -163,6 +163,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (resp.status === 401) {
         setUser(null);
         writeCachedUser(null);
+        setAllowOffline(false);
       }
       return false;
     } catch {
@@ -215,7 +216,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       logout,
       getAuthHeaders,
       refreshAccessToken,
-      isAuthenticated: !!user,
+      isAuthenticated: !!user || allowOffline,
       refreshUser,
     }}>
       {children}
