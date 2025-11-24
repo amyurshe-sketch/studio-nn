@@ -25,7 +25,7 @@ export default function LoginPage() {
       }}
     >
       <div style={{ width: '100%', maxWidth: 520 }}>
-        <Link to="/" style={{ display: 'inline-block', marginBottom: 16, color: 'var(--color-muted)' }}>← {t('back.home')}</Link>
+        <Link to="/" style={{ display: 'inline-block', marginBottom: 16, color: 'var(--color-muted)' }}>{t('back.home')}</Link>
         <h2 style={{ margin: 0, color: 'var(--color-text)' }}>{t('login.title')}</h2>
         <p style={{ marginTop: 8, color: 'var(--color-muted)' }}>{t('login.description')}</p>
         <form

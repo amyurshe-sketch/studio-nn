@@ -61,7 +61,7 @@ const resources: Resources = {
     'home.invite.cta.login': 'Войти в аккаунт'
     ,
     // LoginPage
-    'login.back': '← На главную',
+    'login.back': 'На главную',
     'login.title': 'Вход в систему',
     'login.description': 'Введите имя пользователя и пароль.',
     'login.username': 'Имя пользователя:',
@@ -143,7 +143,7 @@ const resources: Resources = {
     'leisure.motivation.author': '— Уолт Дисней'
     ,
     // ProfilePage
-    'back.home': '← На главную',
+    'back.home': 'На главную',
     'profile.title': '👤 Личный кабинет',
     'profile.subtitle': 'Ваша персональная информация',
     'profile.loading': 'Загрузка профиля...',
@@ -250,7 +250,7 @@ const resources: Resources = {
     'home.invite.cta.login': 'Sign in'
     ,
     // LoginPage
-    'login.back': '← Home',
+    'login.back': 'Home',
     'login.title': 'Sign in',
     'login.description': 'Enter your username and password.',
     'login.username': 'Username:',
@@ -332,7 +332,7 @@ const resources: Resources = {
     'leisure.motivation.author': '— Walt Disney'
     ,
     // ProfilePage
-    'back.home': '← Home',
+    'back.home': 'Home',
     'profile.title': '👤 Profile',
     'profile.subtitle': 'Your personal information',
     'profile.loading': 'Loading profile...',

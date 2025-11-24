@@ -18,6 +18,14 @@ const AiChatPage = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const messagesRef = useRef<HTMLDivElement | null>(null);
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+
+  const autoResize = useCallback(() => {
+    const el = textareaRef.current;
+    if (!el) return;
+    el.style.height = 'auto';
+    el.style.height = `${Math.min(el.scrollHeight, 240)}px`;
+  }, []);
 
   const handleSend = useCallback(async () => {
     if (loading || !message.trim()) return;
@@ -52,12 +60,13 @@ const AiChatPage = () => {
         { role: 'assistant', content: data.answer || '' },
       ]);
       setMessage('');
+      autoResize();
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Ошибка запроса');
     } finally {
       setLoading(false);
     }
-  }, [message, history, chatId]);
+  }, [message, history, chatId, autoResize]);
 
   useEffect(() => {
     if (!messagesRef.current) return;
@@ -66,6 +75,10 @@ const AiChatPage = () => {
       behavior: 'smooth',
     });
   }, [history]);
+
+  useEffect(() => {
+    autoResize();
+  }, [message, autoResize]);
 
   return (
     <div className="ai-chat">
@@ -93,15 +106,16 @@ const AiChatPage = () => {
         </div>
 
         <div className="ai-chat__prompt ai-chat__prompt--below">
-          <label className="ai-chat__label" htmlFor="ai-message">
-            Текст запроса
-          </label>
           <textarea
             id="ai-message"
+            ref={textareaRef}
             value={message}
-            onChange={(e) => setMessage(e.target.value)}
+            onChange={(e) => {
+              setMessage(e.target.value);
+              autoResize();
+            }}
             placeholder="Спросите что угодно…"
-            rows={3}
+            rows={1}
             maxLength={100}
             onKeyDown={(e) => {
               if (e.key === 'Enter' && !e.shiftKey) {
