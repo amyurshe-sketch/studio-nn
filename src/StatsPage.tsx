@@ -68,7 +68,7 @@ function StatsPage() {
       try {
         setFormStatus('loading');
         setFormStatusMessage('');
-        const response = await fetch('/api/telegram', {
+        const response = await fetch(`${API_BASE_URL}/api/telegram`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
