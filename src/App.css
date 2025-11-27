@@ -74,13 +74,6 @@ a:hover {
   color: var(--color-accent);
 }
 
-.btn-text--compact {
-  padding: 0 !important;
-  letter-spacing: 0;
-  font-size: 0.82rem;
-  text-transform: none !important;
-}
-
 button {
   font-family: var(--font-sans);
   border: none;
