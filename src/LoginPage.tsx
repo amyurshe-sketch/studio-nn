@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useI18n } from './i18n';
 import MessageButton from './components/MessageButton';
+import Preloader from './components/Preloader';
 import { API_BASE_URL } from './lib/env';
 import { useAuth } from './hooks/useAuth';
 
@@ -125,10 +126,11 @@ export default function LoginPage() {
                 </button>
               </div>
             </label>
-            <div>
+            <div style={{ position: 'relative', display: 'inline-block' }}>
               <MessageButton type="submit" disabled={submitting}>
                 {submitting ? t('login.submitting') : t('login.submit')}
               </MessageButton>
+              <Preloader visible={submitting} inline />
             </div>
           </div>
         </form>

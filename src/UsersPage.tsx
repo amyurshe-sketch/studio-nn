@@ -9,6 +9,7 @@ import MessageModal from './components/MessageModal';
 import { Link, useNavigate } from 'react-router-dom';
 import { ButtonText } from './components/ButtonText';
 import { useI18n } from './i18n';
+import Preloader from './components/Preloader';
 
 function UsersPage() {
   const { t } = useI18n();
@@ -471,9 +472,11 @@ function UsersPage() {
         {/* Индикатор загрузки для пагинации */}
         {(loading || allLoading) && (
           <div className="users-loading-backdrop">
-            <div className="users-loading-indicator">
-              <span className="loading-spinner">⏳</span>
+            <div className="users-loading-indicator preloader-host">
               <span className="users-loading-text">{t('users.loading')}</span>
+              <span className="preloader-inline-wrapper">
+                <Preloader visible inline />
+              </span>
             </div>
           </div>
         )}

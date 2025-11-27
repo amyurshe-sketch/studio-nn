@@ -1,6 +1,8 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useI18n } from './i18n';
 import { API_BASE_URL } from './lib/env';
+import AiChatButton from './components/AiChatButton';
+import Preloader from './components/Preloader';
 import './AiChatPage.css';
 
 type ChatMessage = {
@@ -117,24 +119,18 @@ const AiChatPage = () => {
             placeholder="Спросите что угодно…"
             rows={1}
             maxLength={100}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                handleSend();
-              }
-            }}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+              e.preventDefault();
+              handleSend();
+            }
+          }}
           />
           <div className="ai-chat__actions">
-            <button
-              type="button"
-              className="ai-chat__cta"
-              onClick={handleSend}
-              disabled={loading}
-            >
-              <span>{t('ai.cta.line1')}</span>
-              <span>{t('ai.cta.line2')}</span>
-            </button>
-            {loading && <span className="ai-chat__status">Отправка…</span>}
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+              <AiChatButton compact onClick={handleSend} disabled={loading} />
+              <Preloader visible={loading} inline />
+            </div>
             {error && <span className="ai-chat__status ai-chat__status--error">{error}</span>}
           </div>
         </div>

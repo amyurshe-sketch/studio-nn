@@ -74,6 +74,13 @@ a:hover {
   color: var(--color-accent);
 }
 
+.btn-text--compact {
+  padding: 0 !important;
+  letter-spacing: 0;
+  font-size: 0.82rem;
+  text-transform: none !important;
+}
+
 button {
   font-family: var(--font-sans);
   border: none;
@@ -256,6 +263,30 @@ button {
   gap: 48px;
 }
 
+.logo {
+  display: inline-flex;
+  align-items: center;
+  margin: 0;
+  padding: 2px 6px;
+  line-height: 1.1;
+  white-space: nowrap;
+  overflow: visible;
+}
+
+@media (max-width: 640px) {
+  .header-content {
+    padding: 0 16px;
+  }
+  .header-left {
+    gap: 16px;
+  }
+  .logo {
+    white-space: normal;
+    line-height: 1.15;
+    display: inline-block;
+  }
+}
+
 .header-controls {
   display: inline-flex;
   align-items: center;
@@ -330,6 +361,7 @@ button {
   .header-right { gap: 8px; }
   .register-button { padding: 8px 16px; font-size: 0.92rem; }
   .login-button { padding: 8px 0; }
+  .main-nav { gap: 12px; }
 }
 
 @media (max-width: 380px) {
@@ -723,6 +755,16 @@ button {
 [data-theme='dark'] .mobile-nav-link:hover,
 [data-theme='dark'] .mobile-nav-link:focus-visible { background: rgba(99, 102, 241, 0.18); }
 
+@media (max-width: 640px) {
+  /* В мобильном меню заставляем логотип Studio NN переноситься на две строки */
+  .mobile-drawer__title {
+    white-space: normal;
+    line-height: 1.2;
+    display: block;
+    max-width: 110px;
+  }
+}
+
 .error {
   color: var(--color-danger);
   font-weight: 600;
@@ -1058,6 +1100,18 @@ button {
 
 [data-theme='dark'] .users-loading-backdrop {
   background: rgba(15, 23, 42, 0.6);
+}
+
+.preloader-inline-wrapper {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+}
+
+.preloader-host {
+  gap: 12px;
 }
 
 [data-theme='dark'] .users-loading-indicator {

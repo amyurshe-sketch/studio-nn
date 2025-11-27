@@ -3,6 +3,7 @@ import { ButtonText } from './components/ButtonText';
 import MessageModal from './components/MessageModal';
 import Black from './components/Black';
 import MessageButton from './components/MessageButton';
+import AiChatButton from './components/AiChatButton';
 import AnswerModal from './components/AnswerModal';
 import NotificationsModal from './components/NotificationsModal';
 import { useNotifications } from './hooks/useNotifications';
@@ -11,6 +12,7 @@ import { API_BASE_URL } from './lib/env';
 import { useI18n } from './i18n';
 import StudioLogo from './components/StudioLogo';
 import './StatsPage.css';
+import Preloader from './components/Preloader';
 
 
 function StatsPage() {
@@ -19,6 +21,7 @@ function StatsPage() {
   const [isAnswerOpen, setIsAnswerOpen] = useState(false);
   const [isThreadOpen, setIsThreadOpen] = useState(false);
   const [isNotifOpen, setIsNotifOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const { items: notifItems, ack: ackNotif } = useNotifications();
   const [formData, setFormData] = useState({ name: '', contact: '', message: '' });
   const [formStatus, setFormStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
@@ -28,7 +31,13 @@ function StatsPage() {
   const handleClose = useCallback(() => setIsModalOpen(false), []);
   const openAnswer = useCallback(() => setIsAnswerOpen(true), []);
   const closeAnswer = useCallback(() => setIsAnswerOpen(false), []);
-  const openThread = useCallback(() => setIsThreadOpen(true), []);
+  const openThread = useCallback(() => {
+    if (isLoading) return;
+    setIsLoading(true);
+    setTimeout(() => {
+      setIsLoading(false);
+    }, 5000);
+  }, [isLoading]);
   const closeThread = useCallback(() => setIsThreadOpen(false), []);
   
   const handleSend = useCallback((payload: { to: string; subject: string; body: string }) => {
@@ -111,9 +120,18 @@ function StatsPage() {
           <span className="stats-page__preview-label">ButtonText</span>
           <ButtonText className="stats-page__preview-button" onClick={handleOpen}>ButtonText</ButtonText>
         </div>
-        <div className="stats-page__preview-item">
+        <div className="stats-page__preview-item stats-page__black-row">
           <span className="stats-page__preview-label">Black</span>
-          <Black onClick={openThread}>Black</Black>
+          <div className="stats-page__black-slot">
+            <div className={`stats-page__black-wrapper ${isLoading ? 'is-hidden' : ''}`}>
+              <Black onClick={openThread}>Black</Black>
+            </div>
+            <Preloader visible={isLoading} inline />
+          </div>
+        </div>
+        <div className="stats-page__preview-item">
+          <span className="stats-page__preview-label">Чат с ИИ</span>
+          <AiChatButton compact />
         </div>
         <div className="stats-page__preview-item">
           <span className="stats-page__preview-label">MessageButton</span>

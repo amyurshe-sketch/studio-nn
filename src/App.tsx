@@ -110,7 +110,7 @@ function AppShell() {
                   <ButtonText as={Link} to="/users">{t('nav.users')}</ButtonText>
                   <ButtonText as={Link} to="/profile">{t('nav.profile')}</ButtonText>
                   <ButtonText as={Link} to="/leisure">{t('nav.leisure')}</ButtonText>
-                  <ButtonText as={Link} to="/ai-chat">{t('nav.aiChat')}</ButtonText>
+                  <ButtonText as={Link} to="/ai-chat" className="btn-text--compact">{t('nav.aiChat')}</ButtonText>
                 </nav>
               )}
             </div>

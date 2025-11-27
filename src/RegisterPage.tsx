@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import MessageButton from './components/MessageButton';
+import Preloader from './components/Preloader';
 import { useI18n } from './i18n';
 import { Link, useNavigate } from 'react-router-dom';
 import { API_BASE_URL } from './lib/env';
@@ -255,9 +256,12 @@ export default function RegisterPage() {
             </div>
           </label>
           <div>
-            <MessageButton type="submit" disabled={submitting}>
-              {submitting ? 'Создание...' : t('register.submit.register')}
-            </MessageButton>
+            <div style={{ position: 'relative', display: 'inline-block' }}>
+              <MessageButton type="submit" disabled={submitting}>
+                {submitting ? 'Создание...' : t('register.submit.register')}
+              </MessageButton>
+              <Preloader visible={submitting} inline />
+            </div>
           </div>
         </div>
       </form>
