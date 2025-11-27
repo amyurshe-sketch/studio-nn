@@ -75,10 +75,10 @@ export default function RegisterPage() {
             }
             const refreshed = await refreshUser();
             if (refreshed) {
-              navigate('/users', { replace: true });
+              navigate('/leisure', { replace: true });
               return;
             }
-            window.location.href = '/users';
+            window.location.href = '/leisure';
             return;
           } catch (err: any) {
             setError(err?.message || 'Ошибка регистрации');
