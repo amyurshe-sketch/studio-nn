@@ -1,4 +1,5 @@
-import { type CSSProperties, type ElementType } from 'react';
+import { type CSSProperties, type ElementType, useState } from 'react';
+import MaterializeMenu from './MaterializeMenu';
 
 type StudioLogoProps = {
   as?: ElementType;
@@ -11,6 +12,7 @@ const StudioLogo = ({
   className = '',
   style,
 }: StudioLogoProps) => {
+  const [menuOpen, setMenuOpen] = useState(false);
   const baseClasses = ['logo', 'handwrite', className].filter(Boolean).join(' ');
   const baseStyle: CSSProperties = {
     fontFamily: "'Pacifico', 'Brush Script MT', 'Caveat', cursive",
@@ -24,13 +26,23 @@ const StudioLogo = ({
     WebkitTextFillColor: 'transparent',
   };
 
+  const showPreloader = () => {
+    setMenuOpen(true);
+  };
+
   return (
     <Component
       className={baseClasses}
       style={{ ...baseStyle, ...style }}
       aria-label="Studio NN logo"
     >
-      Studio NN
+      Studio{' '}
+      <a className="logo-nn" aria-label="На главную" onClick={(e) => { e.preventDefault(); showPreloader(); }}>
+        NN
+      </a>
+      {menuOpen && (
+        <MaterializeMenu onClose={() => setMenuOpen(false)} />
+      )}
     </Component>
   );
 };
