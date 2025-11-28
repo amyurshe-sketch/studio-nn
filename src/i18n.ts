@@ -193,7 +193,13 @@ const resources: Resources = {
     'ai.cta.line1': 'Чат',
     'ai.cta.line2': 'ИИ',
     'ai.meta.availability': 'Доступно 24/7',
-    'ai.meta.updated': 'Обновлено: сегодня'
+    'ai.meta.updated': 'Обновлено: сегодня',
+    'ai.greeting': 'Привет, чем могу помочь?',
+    'ai.placeholder': 'Спросите что угодно…',
+    'ai.status.sending': 'Отправка…',
+    'ai.error.request': 'Ошибка запроса',
+    'ai.assistantName': 'Мила',
+    'ai.you': 'Вы'
   },
   en: {
     'app.logo': 'Studio NN',
@@ -382,7 +388,13 @@ const resources: Resources = {
     'ai.cta.line1': 'AI',
     'ai.cta.line2': 'Chat',
     'ai.meta.availability': 'Available 24/7',
-    'ai.meta.updated': 'Updated: today'
+    'ai.meta.updated': 'Updated: today',
+    'ai.greeting': 'Hi, how can I help you?',
+    'ai.placeholder': 'Ask me anything…',
+    'ai.status.sending': 'Sending…',
+    'ai.error.request': 'Request failed',
+    'ai.assistantName': 'Mila',
+    'ai.you': 'You'
   },
 };
 

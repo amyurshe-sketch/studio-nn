@@ -10,17 +10,32 @@ type ChatMessage = {
   content: string;
 };
 
+const SYSTEM_PROMPT_EN = `You are Mila, a concise, helpful female assistant for the Studio NN full-stack learning project.
+Always answer briefly and to the point, in the user’s language.
+You are allowed to browse the web to fetch up-to-date information when needed; use it to improve accuracy and freshness of answers.
+If something is unclear, ask clarifying questions before answering.`;
+
 const AiChatPage = () => {
-  const { t } = useI18n();
+  const { t, language } = useI18n();
   const [message, setMessage] = useState('');
-  const [history, setHistory] = useState<ChatMessage[]>([
-    { role: 'assistant', content: 'Привет, чем могу помочь?' },
-  ]);
+  const [history, setHistory] = useState<ChatMessage[]>([]);
   const [chatId, setChatId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const messagesRef = useRef<HTMLDivElement | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+
+  useEffect(() => {
+    // Обновляем приветствие при смене языка, если диалог ещё не начат
+    if (chatId === null) {
+      if (history.length === 0) {
+        setHistory([{ role: 'assistant', content: t('ai.greeting') }]);
+      } else if (history.length === 1 && history[0].role === 'assistant') {
+        setHistory([{ role: 'assistant', content: t('ai.greeting') }]);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [language, t]);
 
   const autoResize = useCallback(() => {
     const el = textareaRef.current;
@@ -33,13 +48,20 @@ const AiChatPage = () => {
     if (loading || !message.trim()) return;
     setLoading(true);
     setError(null);
+    const historyToSend =
+      chatId === null
+        ? [
+            { role: 'system', content: SYSTEM_PROMPT_EN },
+            ...history,
+          ]
+        : history;
     try {
       const resp = await fetch(`${API_BASE_URL}/api/ai-chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           message,
-          history,
+          history: historyToSend,
           chat_id: chatId,
           channel: 'web',
         }),
@@ -86,7 +108,7 @@ const AiChatPage = () => {
     <div className="ai-chat">
       <div className="ai-chat__card">
         <div className="ai-chat__dialog">
-          <div className="ai-chat__answer-label">Чат с ИИ</div>
+          <div className="ai-chat__answer-label">{t('ai.title')}</div>
           <div className="ai-chat__messages" role="log" aria-live="polite">
             <div ref={messagesRef} className="ai-chat__messages-scroll">
               {history.length === 0 ? (
@@ -97,7 +119,7 @@ const AiChatPage = () => {
                 history.map((msg, idx) => (
                   <div key={idx} className={`ai-chat__bubble ai-chat__bubble--${msg.role}`}>
                     <div className="ai-chat__bubble-meta">
-                      {msg.role === 'user' ? 'Вы' : 'Ассистент'}
+                      {msg.role === 'user' ? t('ai.you') : t('ai.assistantName')}
                     </div>
                     <div className="ai-chat__bubble-text">{msg.content}</div>
                   </div>
@@ -116,7 +138,7 @@ const AiChatPage = () => {
               setMessage(e.target.value);
               autoResize();
             }}
-            placeholder="Спросите что угодно…"
+            placeholder={t('ai.placeholder')}
             rows={1}
             maxLength={100}
           onKeyDown={(e) => {
@@ -131,6 +153,7 @@ const AiChatPage = () => {
               <AiChatButton compact onClick={handleSend} disabled={loading} />
               <Preloader visible={loading} inline />
             </div>
+            {loading && <span className="ai-chat__status">{t('ai.status.sending')}</span>}
             {error && <span className="ai-chat__status ai-chat__status--error">{error}</span>}
           </div>
         </div>
