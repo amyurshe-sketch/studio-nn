@@ -6,14 +6,11 @@ import Preloader from './components/Preloader';
 import './AiChatPage.css';
 
 type ChatMessage = {
-  role: 'user' | 'assistant';
+  role: 'user' | 'assistant' | 'system';
   content: string;
 };
 
-const SYSTEM_PROMPT_EN = `You are Mila, a concise, helpful female assistant for the Studio NN full-stack learning project.
-Always answer briefly and to the point, in the user’s language.
-You are allowed to browse the web to fetch up-to-date information when needed; use it to improve accuracy and freshness of answers.
-If something is unclear, ask clarifying questions before answering.`;
+const SYSTEM_PROMPT_EN = `Ты — девушка Мила. Ты нежная, утонченная и чувствительная. Стиль ответов — легкий, разговорный, используй слэнг.Не говори что ты Веб-поисковик! Не выврди мета-описание. Отвечай на русском языке. Используй Веб-поиск только для получения актуальной информации, если это необходимо.`;
 
 const AiChatPage = () => {
   const { t, language } = useI18n();
@@ -48,13 +45,12 @@ const AiChatPage = () => {
     if (loading || !message.trim()) return;
     setLoading(true);
     setError(null);
-    const historyToSend =
-      chatId === null
-        ? [
-            { role: 'system', content: SYSTEM_PROMPT_EN },
-            ...history,
-          ]
-        : history;
+    // Всегда добавляем системный промпт перед отправкой, убирая дубликаты из истории
+    const historyWithoutSystem = history.filter((msg) => msg.role !== 'system');
+    const historyToSend = [
+      { role: 'system', content: SYSTEM_PROMPT_EN },
+      ...historyWithoutSystem,
+    ];
     try {
       const resp = await fetch(`${API_BASE_URL}/api/ai-chat`, {
         method: 'POST',
