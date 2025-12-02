@@ -19,6 +19,11 @@ const AiChatPage = () => {
   const [chatId, setChatId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [nowLabelParts, setNowLabelParts] = useState<{ prefix: string; seconds: string; suffix: string }>({
+    prefix: '',
+    seconds: '',
+    suffix: '',
+  });
   const messagesRef = useRef<HTMLDivElement | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 
@@ -40,6 +45,38 @@ const AiChatPage = () => {
     el.style.height = 'auto';
     el.style.height = `${Math.min(el.scrollHeight, 240)}px`;
   }, []);
+
+  useEffect(() => {
+    const updateNow = () => {
+      const formatter = new Intl.DateTimeFormat(language === 'ru' ? 'ru-RU' : 'en-GB', {
+        weekday: 'long',
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+      });
+      const parts = formatter.formatToParts(new Date());
+      const secIndex = parts.findIndex((p) => p.type === 'second');
+      const secondsPart = secIndex !== -1 ? parts[secIndex].value : '';
+      const prefixRaw = secIndex !== -1 ? parts.slice(0, secIndex).map((p) => p.value).join('') : parts.map((p) => p.value).join('');
+      const suffixRaw = secIndex !== -1 ? parts.slice(secIndex + 1).map((p) => p.value).join('') : '';
+
+      const capitalize = (text: string) => {
+        if (language !== 'ru' || !text) return text;
+        const first = text.search(/\S/);
+        if (first === -1) return text;
+        return text.slice(0, first) + text[first].toUpperCase() + text.slice(first + 1);
+      };
+
+      const prefix = capitalize(prefixRaw);
+      setNowLabelParts({ prefix, seconds: secondsPart, suffix: suffixRaw });
+    };
+    updateNow();
+    const timer = window.setInterval(updateNow, 1000);
+    return () => window.clearInterval(timer);
+  }, [language]);
 
   const handleSend = useCallback(async () => {
     if (loading || !message.trim()) return;
@@ -103,6 +140,15 @@ const AiChatPage = () => {
   return (
     <div className="ai-chat">
       <div className="ai-chat__card">
+        {(nowLabelParts.prefix || nowLabelParts.seconds || nowLabelParts.suffix) && (
+          <div className="ai-chat__timestamp ai-chat__timestamp--top">
+            {nowLabelParts.prefix}
+            {nowLabelParts.seconds && (
+              <span className="ai-chat__timestamp-seconds">{nowLabelParts.seconds}</span>
+            )}
+            {nowLabelParts.suffix}
+          </div>
+        )}
         <div className="ai-chat__dialog">
           <div className="ai-chat__answer-label">{t('ai.title')}</div>
           <div className="ai-chat__messages" role="log" aria-live="polite">
@@ -137,12 +183,12 @@ const AiChatPage = () => {
             placeholder={t('ai.placeholder')}
             rows={1}
             maxLength={100}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
-              e.preventDefault();
-              handleSend();
-            }
-          }}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                handleSend();
+              }
+            }}
           />
           <div className="ai-chat__actions">
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>

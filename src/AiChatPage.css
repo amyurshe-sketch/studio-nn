@@ -120,6 +120,32 @@
   margin-top: 0;
 }
 
+.ai-chat__timestamp {
+  font-size: 0.95rem;
+  color: var(--color-muted);
+  margin: 4px 0 -2px;
+  font-variant-numeric: tabular-nums;
+}
+
+.ai-chat__timestamp--top {
+  margin: 0 0 12px;
+  text-align: left;
+  padding-bottom: 6px;
+  border-bottom: 2px solid #ef4444;
+  display: inline-block;
+  width: auto;
+}
+
+.ai-chat__timestamp-seconds {
+  color: #ef4444;
+  font-family: 'Comic Sans MS', 'Bradley Hand', 'Pacifico', cursive;
+  display: inline-block;
+  min-width: 2ch;
+  text-align: center;
+  line-height: 1.2;
+  font-size: 1.8rem;
+}
+
 .ai-chat__label {
   font-weight: 700;
   color: var(--color-text);
